@@ -1,0 +1,647 @@
+Data$Stand <- as.factor(Data$Stand)#
+Data$Point <- as.factor(Data$Point)#
+Data$TreeNo <- as.factor(Data$TreeNo)#
+#
+summary(Data)
+TreeData <- groupedData(THT~DBH | Stand, data=Data, labels=list(x='DBH", y="Total Height'),   units=list(x="(inches)", y="(feet)"))#
+#
+attach(TreeData)#
+plot(TreeData)
+library(nlme)
+TreeData <- groupedData(THT~DBH | Stand, data=Data, labels=list(x='DBH", y="Total Height'),   units=list(x="(inches)", y="(feet)"))#
+#
+attach(TreeData)#
+plot(TreeData)
+M5 <- lmer(THT~DBH + (1|Stand/Point) + (DBH|Stand),Data,REML=F)
+summary (M5)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 9 LMMs")
+radon <- read.csv('exampledata/Radon_Data_RB.csv', h=TRUE)
+dim(radon)
+summary(radon)
+radon$floor <- as.factor(radon$floor)
+par(mfrow=c(1,1))
+boxplot(radon~floor, data=radon, notch=T)
+t.test(radon~floor, data=radon, notch=T)
+ggplot(data=radon, aes(x=floor, y=radon,group=1)) + geom_point() +
+geom_smooth(method='lm')
+library(ggplot2)
+ggplot(data=radon, aes(x=floor, y=radon,group=1)) + geom_point() +
+geom_smooth(method='lm')
+ggplot(data=radon, aes(x=floor, y=radon, group=county)) +#
+  geom_point() +#
+  geom_smooth(method='lm') +#
+  facet_wrap(~county)
+mod.radon.lm1 <- lm(radon~floor, data=radon)
+par(mfrow=c(2,2))
+plot(mod.radon.lm1)  ## residuals are large!
+summary(mod.radon.lm1) ## quick look at model
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)
+par(mfrow=c(1,2))
+hist(resid(mod.radon.lmer1))
+hist(ranef(mod.radon.lmer1)[[1]][,1])
+ranef(mod.radon.lmer1)
+summary(mod.radon.lmer1) ## summary of the model
+fixef(mod.radon.lmer1) ## fixed effect coefficients
+summary(mod.radon.lmer1)$coef
+VarCorr(mod.radon.lmer1) ## The variance components
+ranef(mod.radon.lmer1) ## rather long
+str(ranef(mod.radon.lmer1)) ## a list
+res1 <- ranef(mod.radon.lmer1)$county[,1]
+summary(res1) ## mean ~ 0
+hist(res1) ## histogram
+abline(v=mean(res1), col='red')
+firstfloor <- fixef(mod.radon.lmer1)["(Intercept)"] +#
+			fixef(mod.radon.lmer1)["floor1"]+#
+            ranef(mod.radon.lmer1)$county$"(Intercept)"
+firstfloor
+radon1<-lm(radon~floor+county,data=radon)
+summary(radon1)
+radon1<-lm(radon~floor+as.factor(county),data=radon)
+summary(radon1)
+summary(mod.radon.lmer1) ## summary of the model
+summary(radon1)
+ggplot(data=radon, aes(x=floor, y=radon, group=county)) +#
+  geom_point() +#
+  geom_smooth(method='lm') +#
+  facet_wrap(~county)
+mod.radon.lmer2 <- lmer(radon ~ floor + (1+floor|county), data=radon)#
+summary(mod.radon.lmer2) ## summary of the model
+rbind(fixef(mod.radon.lmer1),fixef(mod.radon.lmer2)) ## fixed effects change slightly.
+VarCorr(mod.radon.lmer2) # Note the extra row for floor
+summary(ranef(mod.radon.lmer2)$county) ## now two columns here
+head(ranef(mod.radon.lmer2)$county)
+floor1 <- fixef(mod.radon.lmer2)["(Intercept)"] +
+floor1 <- fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)$county$"(Intercept)"+#
+            ranef(mod.radon.lmer2)$county$"floor1"
+floor1
+floor0 <- fixef(mod.radon.lmer2)["(Intercept)"] +
+ranef(mod.radon.lmer2)$county$"(Intercept)"
+floor0
+floorChange <- floor1-floor0
+floorChange
+fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)[[1]][1,1]+#
+            ranef(mod.radon.lmer2)[[1]][1,2]
+fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)$county[1,1]+#
+            ranef(mod.radon.lmer2)$county[1,2]
+fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)[[2]][1,1]+#
+            ranef(mod.radon.lmer2)[[2]][1,2]
+fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)[[1]][2,1]+#
+            ranef(mod.radon.lmer2)[[1]][2,2]
+floor1
+fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)$county[2,1]+#
+            ranef(mod.radon.lmer2)$county[2,2]
+summary(ranef)
+ranef
+ranef(mod.radon.lmer2)
+q()
+## Fitting different random effects models with lmer#
+#
+## CODE from Robert Bagchi (University of Connecticut)#
+## preliminaries#
+rm(list=ls())  #
+## Set the working directory#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 9 LMMs")#
+getwd()#
+## Load the libraries#
+library(ggplot2)#
+library(lme4) ## library for linear mixed effects models in R#
+library(car)#
+library(arm)#
+library(MuMIn)#
+## load the data#
+radon <- read.csv('exampledata/Radon_Data_RB.csv', h=TRUE)#
+## Look at your data#
+dim(radon)#
+summary(radon)#
+head(radon,n=20)#
+str(radon)#
+#
+radon$floor <- as.factor(radon$floor)#
+par(mfrow=c(1,1))#
+boxplot(radon~floor, data=radon, notch=T)#
+## now add a regression line#
+ggplot(data=radon, aes(x=floor, y=radon,group=1)) + geom_point() +#
+  geom_smooth(method='lm')#
+## separate into different panels for each county#
+ggplot(data=radon, aes(x=floor, y=radon, group=county)) +#
+  geom_point() +#
+  geom_smooth(method='lm') +#
+  facet_wrap(~county)  #
+##note how the patterns differ by county#
+##note how the confidence intervals differ by county, partly due to differences in sample sizes#
+###################################
+## now fit a simple linear model#
+###################################
+mod.radon.lm1 <- lm(radon~floor, data=radon)#
+#
+par(mfrow=c(2,2))#
+plot(mod.radon.lm1)  ## residuals are large!#
+summary(mod.radon.lm1) ## quick look at model#
+##********* BACK TO POWERPOINT *********###
+#################################################
+## CODE 9.1#
+## Fitting a mixed-effects model with lmer#
+################################################
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)#
+par(mfrow=c(1,2))#
+hist(resid(mod.radon.lmer1))  #
+#residuals should be normally distributed#
+hist(ranef(mod.radon.lmer1)[[1]][,1])#
+#random variables (intercepts) should be normally distributed#
+ranef(mod.radon.lmer1)#
+summary(mod.radon.lmer1) ## summary of the model#
+## explanation in powerpoint for 1 slide.#
+fixef(mod.radon.lmer1) ## fixed effect coefficients#
+summary(mod.radon.lmer1)$coef#
+VarCorr(mod.radon.lmer1) ## The variance components#
+## the differences between the overall intercept b0 and the intercept for each county are provided by the random effects or BLUPs#
+ranef(mod.radon.lmer1) ## rather long#
+str(ranef(mod.radon.lmer1)) ## a list#
+res1 <- ranef(mod.radon.lmer1)$county[,1]#
+summary(res1) ## mean ~ 0#
+hist(res1) ## histogram#
+abline(v=mean(res1), col='red')#
+sd(res1) ## std dev of the BLUPs#
+VarCorr(mod.radon.lmer1) ## Model estimate is slightly higher#
+## Random effects should be normally distributed#
+par(mfrow=c(1,1)); qqPlot(res1)#
+## to get the expected radiation level for the ground floor in a given county we can simply add the intercept fixed effect to the random effect values#
+gfloor <- fixef(mod.radon.lmer1)["(Intercept)"] +#
+            ranef(mod.radon.lmer1)$county$"(Intercept)"#
+gfloor#
+mean(gfloor) ## note the mean is not 0 anymore#
+#
+hist(gfloor) #
+abline(v=mean(gfloor), col=2)  #here you can see the mean is simply the estimate#
+## How would we calculate the expected radiation level on the first floor?#
+firstfloor <- fixef(mod.radon.lmer1)["(Intercept)"] +#
+			fixef(mod.radon.lmer1)["floor1"]+#
+            ranef(mod.radon.lmer1)$county$"(Intercept)"#
+##********* BACK TO POWERPOINT *********###
+########################################
+##  CODE 9.2#
+## Fit a random slope model#
+#######################################
+## recall:#
+## separate into different panels for each county#
+ggplot(data=radon, aes(x=floor, y=radon, group=county)) +#
+  geom_point() +#
+  geom_smooth(method='lm') +#
+  facet_wrap(~county)  #
+  ##note how the slopes differ by county#
+#so add random slopes into the model#
+mod.radon.lmer2 <- lmer(radon ~ floor + (1+floor|county), data=radon)#
+summary(mod.radon.lmer2) ## summary of the model#
+## compare the models#
+rbind(fixef(mod.radon.lmer1),fixef(mod.radon.lmer2)) ## fixed effects change slightly.#
+VarCorr(mod.radon.lmer2) # Note the extra row for floor#
+# Also extra column for correlation between the random effects#
+summary(ranef(mod.radon.lmer2)$county) ## now two columns here#
+##First column is difference between overall intercept and intercept in that county#
+## Second column is the difference between overall slope and the slope in that county.#
+head(ranef(mod.radon.lmer2)$county)#
+## how would we calculate the difference in radon concentration between the ground and first floor in county 2?#
+## what is the radon concentration in county 1 on the ground floor?#
+## What is the radon concentration in county 1 on the first floor?#
+#either#
+floor1 <- fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)$county$"(Intercept)"+#
+            ranef(mod.radon.lmer2)$county$"floor1"#
+#
+#or#
+            fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)[[1]][1,1]+#
+            ranef(mod.radon.lmer2)[[1]][1,2]#
+#or#
+            fixef(mod.radon.lmer2)["(Intercept)"] +#
+			fixef(mod.radon.lmer2)["floor1"]+#
+            ranef(mod.radon.lmer2)$county[1,1]+#
+            ranef(mod.radon.lmer2)$county[1,2]
+## preliminaries#
+rm(list=ls())  #
+## Set the working directory#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 9 LMMs")
+library(ggplot2)#
+library(lme4) ## library for linear mixed effects models in R#
+library(car)#
+library(arm)#
+library(MuMIn)
+## load the data#
+radon <- read.csv('exampledata/Radon_Data_RB.csv', h=TRUE)
+radon$floor <- as.factor(radon$floor)
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)
+mod.radon.lmer2 <- lmer(radon ~ floor + (1+floor|county), data=radon)
+resids <- resid(mod.radon.lmer1, type='pearson')
+plot(resids~fitted(mod.radon.lmer1))#
+lines(lowess(resids~fitted(mod.radon.lmer1)), col='red')
+boxplot(resids~radon$floor)
+plot(sqrt(abs(resids))~ fitted(mod.radon.lmer1))#
+lines(lowess(sqrt(abs(resids))~#
+               fitted(mod.radon.lmer1)), col='red')
+qqPlot(resids)
+par(mfrow=c(1,2))#
+qqPlot(ranef(mod.radon.lmer2)$county$'(Intercept)')#
+qqPlot(ranef(mod.radon.lmer2)$county$floor)
+r.squaredGLMM(mod.radon.lmer2)
+?r.squaredGLMM
+res1 <- ranef(mod.radon.lmer1)$county[,1]
+summary(res1) ## mean ~ 0
+hist(res1) ## histogram
+abline(v=mean(res1), col='red')
+VarCorr(mod.radon.lmer1) ## Model estimate is slightly higher
+table(radon$cgroup, radon$county) ## each county is only occurring once
+colSums(table(radon$cgroup, radon$county)!=0) ## all values are == 1
+isNested( radon$county, radon$cgroup)
+isNested( radon$cgroup, radon$county) # cgroup is not nested in county!
+mod.radon.lmer3 <- lmer(radon~floor + (1|cgroup/county),                     data=radon)
+summary(mod.radon.lmer3)
+mod.radon.lmer3b <- lmer(radon~floor + (1|cgroup) +  (1|cgroup:county),data=radon)
+rbind(fixef(mod.radon.lmer3),fixef(mod.radon.lmer3b)) ## identical
+cbind(VarCorr(mod.radon.lmer3), #
+      VarCorr(mod.radon.lmer3b))
+VarCorr(mod.radon.lmer3
+)
+setwd("//Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 10 Predictions with LMMs exercises")
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)
+biodepth <- read.csv('exercises/Biodepth.csv')
+summary(biodepth)
+mod.bd.lmer1 <- lmer(biomass~log.diversity + (1|location),
+data=biodepth)
+summary(mod.bd.lmer1)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 9 LMMs")
+isNested( biodepth $block, biodepth $location)
+summary(biodepth)
+biodepth <- read.csv("exercises/Biodepth.csv", h=TRUE)
+isNested( biodepth $block.site, biodepth $location)
+summary(biodepth)
+biodepth <- read.csv("exercises/Biodepth.csv", h=TRUE)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 9 LMMs")
+biodepth <- read.csv("exercises/Biodepth.csv", h=TRUE)
+summary(biodepth)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 9 LMMs")
+biodepth <- read.csv("exercises/Biodepth.csv", h=TRUE)
+summary(biodepth)
+getwd()
+biodepth <- read.csv("exercises/Biodepth.csv", h=TRUE)
+summary(biodepth)
+biodepth <- read.csv("exercises/Biodepth.csv", h=TRUE)
+summary(biodepth)
+## quick plot#
+ggplot(biodepth, aes(x=log.diversity, y=biomass, group=location)) +#
+  geom_point() + geom_smooth(method='lm') +#
+  facet_wrap(~location, scale='free_y')
+ggplot(biodepth, aes(x=log.diversity, y=biomass, group=block)) +#
+  geom_point() + geom_smooth(method='lm') +#
+  facet_wrap(~location, scale='free_y')
+mod.bd.lmer1 <- lmer(biomass~log.diversity + (1|location), data=biodepth)
+biodepth <- read.csv("exercises/Biodepth.csv", h=TRUE)
+summary(biodepth)
+q()
+setwd("/Users/kyletomlinson/Dropbox/Teaching/XTBG advanced stats 2018/Lectures/Lesson 5 LMMs")
+# PRACTICAL 4: Intro to Mixed models#
+#
+#here I shall very basically introduce you to mixed models#
+#
+#you will need to install and load the package lme4, a package designed specifically to handle mixed effects problems#
+#
+library(lme4)
+#so here we make the same dummy dataset#
+#
+DogID = c(rep(1:16, each = 4))#
+Drug = c(rep(rep(1:2,each = 4),8))#
+DogType = c(rep(1:2,each = 32))#
+Time = c(rep(1:4,16))#
+Yhist = c(12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34,12,46,23,46,18,43,52,65,76,98,13,24,16,78,12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34)#
+df1 <- data.frame(DogID,Drug,DogType,Time,Yhist)#
+df1$DogID <- as.factor(df1$DogID)#
+df1$Drug <- as.factor(df1$Drug)#
+df1$DogType <- as.factor(df1$DogType)#
+df1$Time <- as.factor(df1$Time)#
+#
+summary(df1)#
+#NOW, as you have seen previously, this problem can be handled with ANOVA#
+#
+mod1 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df1)#
+summary(mod1)
+MM1 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df1)#
+summary(MM1)#
+#
+anova(MM1)#
+#
+summary(mod1)
+anova(MM1)
+summary(mod1)
+#NOW lets see what happens when we introduce some missing values into the response data#
+#please note that I introduce missing values using "NA", which basically means 'not available'#
+Yhist = c(12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,56,34,12,46,23,46,18,43,52,65,76,98,13,24,16,78,12,3,45,NA,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34)#
+df2 <- data.frame(DogID,Drug,DogType,Time,Yhist)#
+#
+df2$DogID <- as.factor(df2$DogID)#
+df2$Drug <- as.factor(df2$Drug)#
+df2$DogType <- as.factor(df2$DogType)#
+df2$Time <- as.factor(df2$Time)#
+#
+summary(df2)#
+#
+#try ANOVA:#
+#
+mod2 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df2)
+MM2 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df2)#
+summary(MM2)#
+#
+#it works. and the coefficients havent changed that much#
+anova(MM2)
+mod1 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df1)
+summary(mod1)
+MM1 <- lmer(Yhist~Drug*DogType*Time + (1|DogID/Time),df1)
+MM1 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df1)
+summary(MM1)
+anova(MM1)
+summary(mod1)
+Yhist = c(12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,56,34,12,46,23,46,18,43,52,65,76,98,13,24,16,78,12,3,45,NA,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34)
+df2 <- data.frame(DogID,Drug,DogType,Time,Yhist)
+df2$DogID <- as.factor(df2$DogID)#
+df2$Drug <- as.factor(df2$Drug)#
+df2$DogType <- as.factor(df2$DogType)#
+df2$Time <- as.factor(df2$Time)#
+#
+summary(df2)
+mod2 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df2)
+MM2 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df2)
+summary(MM2)
+anova(MM2)
+anova(MM1)
+#EXERCISE 4.2. Model selection of fixed effects using LRTs: Fertiliser X Irrigation Problem#
+#Here we have a crop yield experiment with blocking and with two fertiliser treatments (N, P) fully crossed inside each block#
+#In this case we assume that we know the amts of fertiliser being added, so our N and P variables are continuous#
+Block = c(1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5) #
+N = c(1,1,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2)#
+P = c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3)#
+Yield = c(12,3,25,34,45,67,28,34,36,45,67,89,13,24,6,78,75,43,52,65,76,98,48,24,34,12,46,23,46,18)#
+#
+df3 <- data.frame(Block,N,P,Yield)#
+summary(df3)#
+df3$Block <-as.factor(df3$Block)#
+summary(df3)#
+dim(df3)#
+#in this analysis, we recognise that the treatments are arranged into blocks, which is our random effect#
+#lmer() uses restricted maximum likelihood (REML) to estimate parameters. When doing model selection it is advised to use maximum likelihood instead, so we must instruct lmer() not to use REML#
+#
+M1 <- lmer(Yield~N*P + (1|Block),df3, REML=F)#
+summary(M1)#
+#
+#the interaction term has a rather low 't' value, so we try first try to drop the t-value#
+#
+M2 <- lmer(Yield~N+P + (1|Block),df3, REML=F)#
+summary(M2)#
+#
+#run a LRT using the anova() function#
+#
+anova(M1,M2)#
+#
+#here the probability of the test is non-significant, so you can safely drop the interaction as there has been no significant change to the maximum likelihood estimate of the model#
+#the next smallest 't' value is P, so lets drop it#
+#
+M3 <- lmer(Yield~N + (1|Block),df3, REML=F)#
+summary(M3)#
+#
+#we compare it to the previous model#
+anova(M2,M3)#
+#
+#again no significant change to the likelihood, so we can drop P from the model#
+#so now we are down to Yield ~ N. Is N significant? Check it against the grand mean model#
+#
+M4 <- lmer(Yield~1 + (1|Block),df3, REML=F)#
+summary(M4)#
+#
+anova(M3,M4)#
+#
+#there is a signicant LRT, so N is explaining a significant portion of the data variance, so we should retain it in the model. Now we switch back to REML to get the best parameter estimates.#
+#
+M3 <- lmer(Yield~N + (1|Block),df3)#
+summary(M3)#
+#
+#Hence the final model is: Yield ~ 8.8 + 22.267*N.
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
+#
+# EXERCISE 4.3. A more typical mixed effects problem..#
+# Data (based on Robinson and Wykoff 2004)                  #
+# Linear Mixed Model with nesting (trees on plots within stands)#
+# Problem taken from: http://www.growthmodel.org/mixedmodels/mixedmodels.htm#
+#
+# here I have borrowed from an existing problem online which I have much simplified!!#
+# The problem is about predicting tree height (THT) using diameter at breast height (DBH).#
+# The data is taken on multiple trees at different points in different stands#
+# tree values could differ between stands and even between points in stands, so these are nested random efects.#
+# Read in data with variable names in the header (the first line of the data file)#
+getwd()#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 8 Intro to linear mixed models")#
+Data <- read.table("Example3.DAT", header=TRUE)#
+#
+summary(Data)#
+Data$Stand <- as.factor(Data$Stand)#
+Data$Point <- as.factor(Data$Point)#
+Data$TreeNo <- as.factor(Data$TreeNo)#
+#
+summary(Data)#
+dim(Data)#
+#
+#please note how uneven the sampling is in each stand
+# Read in data with variable names in the header (the first line of the data file)#
+getwd()#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 8 Intro to linear mixed models")#
+Data <- read.table("Example3.DAT", header=TRUE)#
+#
+summary(Data)#
+Data$Stand <- as.factor(Data$Stand)#
+Data$Point <- as.factor(Data$Point)#
+Data$TreeNo <- as.factor(Data$TreeNo)#
+#
+summary(Data)#
+dim(Data)#
+#
+#please note how uneven the sampling is in each stand
+library(nlme)#
+#
+TreeData <- groupedData(THT~DBH | Stand, data=Data, labels=list(x='DBH", y="Total Height'),   units=list(x="(inches)", y="(feet)"))#
+#
+attach(TreeData)#
+plot(TreeData)
+M5 <- lmer(THT~DBH + (1|Stand/Point) + (DBH|Stand),Data,REML=F)#
+summary (M5)
+# EXERCISE 4.3. A more typical mixed effects problem..#
+# Data (based on Robinson and Wykoff 2004)                  #
+# Linear Mixed Model with nesting (trees on plots within stands)#
+# Problem taken from: http://www.growthmodel.org/mixedmodels/mixedmodels.htm#
+#
+# here I have borrowed from an existing problem online which I have much simplified!!#
+# The problem is about predicting tree height (THT) using diameter at breast height (DBH).#
+# The data is taken on multiple trees at different points in different stands#
+# tree values could differ between stands and even between points in stands, so these are nested random efects.#
+# Read in data with variable names in the header (the first line of the data file)#
+getwd()#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 8 Intro to linear mixed models")#
+Data <- read.table("Example3.DAT", header=TRUE)#
+#
+summary(Data)#
+Data$Stand <- as.factor(Data$Stand)#
+Data$Point <- as.factor(Data$Point)#
+Data$TreeNo <- as.factor(Data$TreeNo)#
+#
+summary(Data)#
+dim(Data)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 8 Intro to linear mixed models")
+Data <- read.table("Example3.DAT", header=TRUE)
+summary(Data)#
+Data$Stand <- as.factor(Data$Stand)#
+Data$Point <- as.factor(Data$Point)#
+Data$TreeNo <- as.factor(Data$TreeNo)#
+#
+summary(Data)#
+dim(Data)
+head(Data)
+dim(Data)
+library(nlme)
+TreeData <- groupedData(THT~DBH | Stand, data=Data, labels=list(x='DBH", y="Total Height'),   units=list(x="(inches)", y="(feet)"))
+quartz()
+TreeData <- groupedData(THT~DBH | Stand, data=Data, labels=list(x='DBH", y="Total Height'),   units=list(x="(inches)", y="(feet)"))
+plot(TreeData)                                # plot grouped data
+M5 <- lmer(THT~DBH + (1|Stand/Point) + (DBH|Stand),Data,REML=F)
+summary (M5)
+M6 <- lmer(THT~DBH + (1|Stand/Point),Data,REML=F)
+summary (M6)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/XTBG advanced stats 2018/Lectures/Lesson 5 LMMs")
+getwd()#
+## Load the libraries#
+library(ggplot2)#
+library(lme4) ## library for linear mixed effects models in R#
+library(car)#
+library(arm)#
+library(MuMIn)
+radon <- read.csv('exampledata/Radon_Data_RB.csv', h=TRUE)
+dim(radon)
+summary(radon)
+head(radon,n=20)
+str(radon)
+radon$floor <- as.factor(radon$floor)
+summary(radon)
+head(radon,n=20)
+radon
+radon$floor <- as.factor(radon$floor)
+radon$county <- as.factor(radon$county)
+radon$cgroup <- as.factor(radon$cgroup)
+summary(radon)
+par(mfrow=c(1,1))#
+boxplot(radon~floor, data=radon, notch=T)
+## now add a regression line#
+ggplot(data=radon, aes(x=floor, y=radon,group=1)) + geom_point() +#
+  geom_smooth(method='lm')
+ggplot(data=radon, aes(x=floor, y=radon, group=county)) +#
+  geom_point()
+ggplot(data=radon, aes(x=floor, y=radon, group=county)) +#
+  geom_point() +#
+  geom_smooth(method='lm') +#
+  facet_wrap(~county)
+mod.radon.lm1 <- lm(radon~floor, data=radon)
+par(mfrow=c(2,2))#
+plot(mod.radon.lm1)
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)
+par(mfrow=c(1,2))#
+hist(resid(mod.radon.lmer1))  #
+#residuals should be normally distributed#
+hist(ranef(mod.radon.lmer1)[[1]][,1])
+ranef(mod.radon.lmer1)
+summary(mod.radon.lmer1) ## summary of the model
+fixef(mod.radon.lmer1) ## fixed effect coefficients
+summary(mod.radon.lmer1)$coef
+VarCorr(mod.radon.lmer1) ## The variance components
+ranef(mod.radon.lmer1) ## rather long
+str(ranef(mod.radon.lmer1)) ## a list
+res1 <- ranef(mod.radon.lmer1)$county[,1]#
+summary(res1) ## mean ~ 0#
+hist(res1) ## histogram#
+abline(v=mean(res1), col='red')
+sd(res1) ## std dev of the BLUPs
+VarCorr(mod.radon.lmer1) ## The variance components
+sd(res1) ## std dev of the BLUPs
+VarCorr(mod.radon.lmer1) ## Model estimate is slightly higher
+res1 <- ranef(mod.radon.lmer1)$county[,1]#
+summary(res1) ## mean ~ 0#
+hist(res1) ## histogram#
+abline(v=mean(res1), col='red')
+sd(res1) ## std dev of the BLUPs
+par(mfrow=c(1,1)); qqPlot(res1)
+gfloor <- fixef(mod.radon.lmer1)["(Intercept)"] +
+ranef(mod.radon.lmer1)$county$"(Intercept)"
+gfloor
+mean(gfloor) ## note the mean is not 0 anymore
+gfloor <- fixef(mod.radon.lmer1)["(Intercept)"]
+fixef(mod.radon.lmer1)["(Intercept)"]
+hist(gfloor) #
+abline(v=mean(gfloor), col=2)
+gfloor <- fixef(mod.radon.lmer1)["(Intercept)"] +#
+            ranef(mod.radon.lmer1)$county$"(Intercept)"
+gfloor#
+mean(gfloor) ## note the mean is not 0 anymore#
+#
+hist(gfloor) #
+abline(v=mean(gfloor), col=2)
+firstfloor <- fixef(mod.radon.lmer1)["(Intercept)"] +#
+			fixef(mod.radon.lmer1)["floor1"]+#
+            ranef(mod.radon.lmer1)$county$"(Intercept)"
+firstfloor
+## recall:#
+## separate into different panels for each county#
+ggplot(data=radon, aes(x=floor, y=radon, group=county)) +#
+  geom_point() +#
+  geom_smooth(method='lm') +#
+  facet_wrap(~county)
+mod.radon.lmer2 <- lmer(radon ~ floor + (1+floor|county), data=radon)
+summary(mod.radon.lmer2) ## summary of the model
+rbind(fixef(mod.radon.lmer1),fixef(mod.radon.lmer2))
+floor1 <- fixef(mod.radon.lmer2)["(Intercept)"] +ranef(mod.radon.lmer2)$county$"(Intercept)" +fixef(mod.radon.lmer2)["floor1"]+ranef(mod.radon.lmer2)$county$"floor1"
+floor1
+ranef
+ranef(mod.radon.lmer2)
+resids <- resid(mod.radon.lmer1, type='pearson')
+plot(resids~fitted(mod.radon.lmer1))#
+lines(lowess(resids~fitted(mod.radon.lmer1)), col='red')
+plot(sqrt(abs(resids))~ fitted(mod.radon.lmer1))#
+lines(lowess(sqrt(abs(resids))~#
+               fitted(mod.radon.lmer1)), col='red')
+qqPlot(resids)
+par(mfrow=c(1,2))#
+qqPlot(ranef(mod.radon.lmer2)$county$'(Intercept)')#
+qqPlot(ranef(mod.radon.lmer2)$county$floor)
+r.squaredGLMM(mod.radon.lmer2)
+table(radon$cgroup, radon$county) ## each county is only occurring once
+isNested( radon$county, radon$cgroup)
+isNested( radon$cgroup, radon$county) # cgroup is not nested in county!
+mod.radon.lmer3 <- lmer(radon~floor + (1|cgroup/county),                     data=radon)
+summary(mod.radon.lmer3)
+mod.radon.lmer3b <- lmer(radon~floor + (1|cgroup) +  (1|cgroup:county),data=radon)
+rbind(fixef(mod.radon.lmer3),fixef(mod.radon.lmer3b)) ## identical
+cbind(VarCorr(mod.radon.lmer3), #
+      VarCorr(mod.radon.lmer3b))
+q()
+q()

@@ -1,0 +1,321 @@
+?lmer
+library(lme4)
+?lmer
+trees <- read.csv('exampledata/trees.csv')
+dim(trees)
+summary(trees)
+head(trees)
+rinosy <- read.csv('exampledata/rinosy.csv')
+names(rinosy) <- c('tag', 'x', 'y', 'dbh1', 'dbh2', 'rgr', 'elev')
+summary(rinosy)
+ggplot(data=rinosy, aes(x=x, y=y, size=rgr, colour=elev)) +#
+  geom_point()
+m.rs1 <- gls(rgr~elev, data=rinosy)
+plot(Variogram(m.rs1, form=~x+y, maxDist=20))
+plot(Variogram(m.rs1, form=~x+y, maxDist=30))
+plot(Variogram(m.rs1, form=~x+y, maxDist=50))
+plot(Variogram(m.rs1, form=~x+y, maxDist=100))
+ggplot(data=rinosy, aes(x=x, y=y, size=rgr, colour=elev)) +#
+  geom_point()
+plot(Variogram(m.rs1, form=~x+y, maxDist=200))
+plot(Variogram(m.rs1, form=~x+y, maxDist=300))
+m.rs2 <- update(m.rs1, correlation=corExp(form=~x+y))
+anova(m.rs1, m.rs2) ## doesn't improve model fit
+plot(Variogram(m.rs2, form=~x+y, maxDist=100))
+m.rs3 <- update(m.rs2, #
+                correlation=corExp(form=~x+y, nugget=T))
+anova(m.rs1, m.rs2, m.rs3)
+m.rs4 <- update(m.rs1, #
+                correlation=corSpher(form=~x+y, nugget=T))
+anova(m.rs1, m.rs4)
+plot(Variogram(m.rs4, form=~x+y))
+m.rs5 <- update(m.rs1, #
+                correlation=corRatio(form=~x+y, nugget=
+anova(m.rs1, m.rs5)
+m.rs5 <- update(m.rs1, #
+                correlation=corRatio(form=~x+y, nugget=T))
+anova(m.rs1, m.rs5)
+plot(Variogram(m.rs5, form=~x+y, nugget=T))
+ggplot(data=trees, aes(x=x, y=y, colour=li, size=RGR)) +#
+  geom_point() + facet_wrap(~sp) + coord_equal()
+trees <- read.csv('exampledata/trees.csv')#
+dim(trees)#
+summary(trees)#
+head(trees)#
+ggplot(data=trees, aes(x=x, y=y, colour=li, size=RGR)) +#
+  geom_point() + facet_wrap(~sp) + coord_equal()
+m.tree1 <- lm(RGR ~ sp*li, data=trees)#
+anova(m.tree1)#
+summary(m.tree1)#
+## naive model again using gls function#
+m.tree2 <- gls(RGR ~ sp*li, data=trees)#
+coef(m.tree1)#
+coef(m.tree2) ## same result; gls assumes identity matrix#
+#
+plot(trees$li,m.tree2$resid)
+plot(Variogram(m.tree2, form=~x+y)) ## definitely some spatial effects
+m.tree3a <- update(m.tree3, correlation=corExp(form=~x+y, nugget=T))
+m.tree3a <- update(RGR~sp*li, correlation=corExp(form=~x+y, nugget=T))
+m.tree3a <- update(RGR~sp*li, correlation=corExp(form=~x+y, nugget=T),data=trees)
+m.tree3a <- gls(RGR~sp*li, correlation=corExp(form=~x+y, nugget=T),data=trees)
+plot(Variogram(m.tree3a, form=~x+y, resType='n'))  #trend removed!
+?Variogram
+?resType
+plot(Variogram(m.tree3a, form=~x+y))  #trend removed!
+plot(Variogram(m.tree3a, form=~x+y, resType='n'))  #trend removed!
+plot(Variogram(m.rs4, form=~x+y,resType='n'))
+plot(Variogram(m.rs5, form=~x+y, nugget=T, resType='n'))
+plot(Variogram(m.rs5, form=~x+y, resType='n'))
+plot(Variogram(m.tree3a, form=~x+y, resType='n'), ylim=c(0, 1))
+plot(Variogram(m.tree3a, form=~x+y, resType='n'))  #trend removed!
+AIC(m.tree2,m.tree3a)
+q()
+###########################################
+## Robert Bagchi#
+## 13-19/7/2014#
+###########################################
+## Prac 9: Generalised least squares#
+rm(list=ls())#
+library(nlme)#
+library(ggplot2)#
+#####################################################
+Code 9.1 - weighting residuals to improve behaviour#
+#####################################################
+#
+#here we will use some simulation to show some simple error structures that can be dealt with using generalised least squares#
+#we will simulate a plant growth experiment with irrigation and soil type treatments#
+## Let's make up some data :-)#
+irr2 <- data.frame(water=runif(100, 0, 10), soil=sample(c('loam', 'sand'), 100, replace=T))#
+#
+dim(irr2)         #
+summary(irr2)
+## make up a heterscedastic error where the variance increases#
+## with the fitted values#
+beta <- c(5, 0.4)   #these are the coefficients of our regression relationship ;-)#
+X <- model.matrix(~water, data=irr2)#
+X   #now it is set up as the components of a regression model ~ 1 + B*Water#
+#
+#predict y values using X and the betas#
+irr2$y <- as.vector(X %*% beta)#
+summary(irr2)#
+#
+plot(irr2$water,irr2$y)#
+## make the variance increase with the mean#
+irr2$y <- irr2$y + rnorm(100, mean=0, sd=sqrt(0.1*irr2$y^3))#
+y2 <- as.vector(X %*% beta)#
+irr2#
+plot(irr2$y~y2)
+modlm <- lm(y ~ water, data=irr2)
+summary(modlm)
+mod1 <- gls(y ~ water, data=irr2)
+summary(mod1)
+anova(mod1)
+Anova(mod1,type="II")
+library(car)
+Anova(mod1,type="II")
+Dev(mod1)
+dev(mod1)
+deviance(mod1)
+mod1 <- gls(y ~ water, data=irr2,REML=F)
+Anova(mod1,type="II")
+deviance(mod1)
+q()
+rm(list=ls())#
+library(nlme)#
+library(ggplot2)
+irr2 <- data.frame(water=runif(100, 0, 10), soil=sample(c('loam', 'sand'), 100, replace=T))
+dim(irr2)         #
+summary(irr2)   #
+## make up a heterscedastic error where the variance increases#
+## with the fitted values#
+beta <- c(5, 0.4)   #these are the coefficients of our regression relationship ;-)#
+X <- model.matrix(~water, data=irr2)#
+X   #now it is set up as the components of a regression model ~ 1 + B*Water
+irr2$y <- as.vector(X %*% beta)
+summary(irr2)
+plot(irr2$water,irr2$y)
+irr2$y <- irr2$y + rnorm(100, mean=0, sd=sqrt(0.1*irr2$y^3))
+y2 <- as.vector(X %*% beta)
+irr2
+plot(irr2$y~y2)
+modlm <- lm(y ~ water, data=irr2)
+summary(modlm)
+mod1 <- gls(y ~ water, data=irr2)
+summary(mod1)
+plot(mod1, (abs(resid(.)))^(1/2)~fitted(.,type='pearson'), type=c('p', 'r'), abline=0) ## obvious trend
+mod1b <- gls(y ~ water, data=irr2, weights=varPower(form=~fitted(.)))
+summary(mod1b)
+plot(mod1b, abs(resid(., type='pearson'))~fitted(.), type=c('p', 'r'), abline=0) ## better
+irr2$y <- as.vector(X %*% beta)
+irr2$y <- irr2$y + rnorm(100, mean=0, sd=irr2$water^0.5)
+plot(y~water, data=irr2)
+hist(irr2$y)
+mod2 <- gls(y~water, data=irr2)
+plot(mod2, abs(resid(., type='p'))~fitted(.), type=c('p', 'r'))
+mod2a <- update(mod2, weights=varPower(form=~water))
+plot(mod2a, abs(resid(., type='p'))~fitted(.), type=c('p', 'r'))
+summary(mod2a)
+rinosy <- read.csv('exampledata/rinosy.csv')
+names(rinosy) <- c('tag', 'x', 'y', 'dbh1', 'dbh2', 'rgr', 'elev')
+summary(rinosy)
+ggplot(data=rinosy, aes(x=x, y=y, size=rgr, colour=elev)) + geom_point()
+m.rs1 <- gls(rgr~elev, data=rinosy)
+plot(Variogram(m.rs1, form=~x+y, resType='n'))
+plot(m.rs1) ##okay
+summary(m.rs1)
+m.rs2 <- update(m.rs1, correlation=corExp(form=~x+y))
+anova(m.rs1, m.rs2) ## doesn't improve model fit
+plot(Variogram(m.rs2, form=~x+y, resType='n'))
+m.rs3 <- update(m.rs2, correlation=corExp(form=~x+y, nugget=T))
+anova(m.rs1, m.rs2, m.rs3)
+m.rs4 <- update(m.rs1, correlation=corSpher(form=~x+y, nugget=T))
+plot(Variogram(m.rs3, form=~x+y, resType='n'))
+m.rs4 <- update(m.rs1, correlation=corSpher(form=~x+y, nugget=T))
+anova(m.rs1, m.rs4)
+plot(Variogram(m.rs4, form=~x+y,resType='n'))
+m.rs5 <- update(m.rs1, correlation=corRatio(form=~x+y, nugget=T))
+anova(m.rs1, m.rs5)
+plot(Variogram(m.rs5, form=~x+y, resType='n'))
+plot(Variogram(m.rs4, form=~x+y,resType='n'))
+plot(Variogram(m.rs5, form=~x+y, resType='n'))
+plot(m.rs1) ##okay
+plot(Variogram(m.rs1, form=~x+y, resType='n'))
+m.rs2 <- update(m.rs1, correlation=corExp(form=~x+y))
+summary(m.rs2)
+summary(m.rs1)
+rinosy <- read.csv('exampledata/Foresttype_BA.csv')
+summary(rinosy)
+rinosy <- read.csv('exampledata/Foresttype_BA.csv')
+summary(rinosy)
+names(rinosy)[1] <- c("Plot")
+summary(rinosy)
+rinosy$forest.type <- as.factor(rinosy$forest.type)
+rinosy$Fragment <- as.factor(rinosy$Fragment)
+rinosy$Plot <- as.factor(rinosy$Plot)
+summary(rinosy)
+ggplot(data=rinosy, aes(x=longitude, y=latitude, size=BA.ha, colour=forest.type)) + geom_point()
+m.rs1 <- gls(BA.ha~ forest.type, data=rinosy)
+plot(Variogram(m.rs1, form=~x+y, resType='n'))
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+plot(m.rs1) ##okay
+hist(rinosy$forest.type)
+hist(rinosy$BA.ha)
+hist(sqrt(rinosy$BA.ha))
+hist(log(rinosy$BA.ha))
+m.rs1 <- gls(log(BA.ha)~ forest.type, data=rinosy)
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+plot(m.rs1) ##okay
+summary(m.rs1)
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+m.rs2 <- update(m.rs1, correlation=corExp(form=~x+y))
+m.rs2 <- update(m.rs1, correlation=corExp(form=~ longitude + latitude))
+summary(m.rs2)
+anova(m.rs1, m.rs2) ## doesn't improve model fit
+plot(Variogram(m.rs2, form=~x+y, resType='n'))
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+rinosy <- read.csv('exampledata/Foresttype_BA.csv')
+summary(rinosy)
+ggplot(data=rinosy, aes(x=longitude, y=latitude, size=BA.ha, colour=elev)) + geom_point()
+hist(rinosy$BA.ha)
+hist(log(rinosy$BA.ha))
+m.rs1 <- gls(log(BA.ha)~ elev, data=rinosy)
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+plot(m.rs1) ##okay
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+m.rs2 <- update(m.rs1, correlation=corExp(form=~ longitude + latitude))
+summary(m.rs2)
+summary(m.rs1)
+ggplot(data=rinosy, aes(x=longitude, y=latitude, size=BA.ha, colour= forest.type)) + geom_point()
+m.rs1 <- gls(log(BA.ha)~ forest.type, data=rinosy)
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+summary(m.rs1)
+plot(m.rs1) ##okay
+m.rs2 <- update(m.rs1, cxorrelation=corExp(form=~ longitude + latitude))
+summary(m.rs2)
+m.rs2 <- update(m.rs1, correlation=corExp(form=~ longitude + latitude))
+summary(m.rs2)
+anova(m.rs1, m.rs2) ## improves model fit
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+m.rs2 <- update(m.rs1, correlation=corExp(form=~ longitude + latitude))
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+m.rs3 <- update(m.rs2, correlation=corExp(form=~longitude + latitude, nugget=T))
+anova(m.rs1, m.rs2, m.rs3)
+plot(Variogram(m.rs3, form=~x+y, resType='n'))
+plot(Variogram(m.rs3, form=~longitude + latitude, resType='n'))
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+treebase <- read.csv('exampledata/Foresttype_BA.csv')
+summary(treebase)
+names(treebase)[1] <- c("Plot")
+#convert characters to factors#
+treebase $Plot <- as.factor(treebase $Plot)#
+treebase $Fragment <- as.factor(treebase $Fragment)#
+treebase $forest.type <- as.factor(treebase $forest.type)
+summary(treebase)
+ggplot(data= treebase, aes(x=longitude, y=latitude, size=BA.ha, colour= forest.type)) + geom_point()
+hist(treebase $BA.ha)
+hist(log(treebase $BA.ha))
+m.rs1 <- gls(log(BA.ha)~ forest.type, data= treebase)
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+plot(m.rs1) ## residual homoscedasticity looks okay
+summary(m.rs1) #some group differences significant
+m.rs2 <- update(m.rs1, correlation=corExp(form=~ longitude + latitude))
+anova(m.rs1, m.rs2) ## improves model fit
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+plot(m.rs2) ## residual homoscedasticity looks okay
+summary(m.rs2)
+m.rs3 <- update(m.rs2, correlation=corExp(form=~longitude + latitude, nugget=T))
+anova(m.rs1, m.rs2, m.rs3) #nugget makes no change in this case
+plot(Variogram(m.rs3, form=~longitude + latitude, resType='n'))
+plot(m.rs2) ## residual homoscedasticity looks okay
+anova(m.rs2)
+anova(m.rs1)
+#and we conclude that forest type has no effect on plot basal area
+q()
+treebase <- read.csv('exampledata/Foresttype_BA.csv')
+summary(treebase)
+names(treebase)[1] <- c("Plot")
+treebase $Plot <- as.factor(treebase $Plot)#
+treebase $Fragment <- as.factor(treebase $Fragment)#
+treebase $forest.type <- as.factor(treebase $forest.type)#
+summary(treebase)#
+#
+ggplot(data= treebase, aes(x=longitude, y=latitude, size=BA.ha, colour= forest.type)) + geom_point()
+rm(list=ls())#
+library(nlme)#
+library(ggplot2)
+ggplot(data= treebase, aes(x=longitude, y=latitude, size=BA.ha, colour= forest.type)) + geom_point()
+summary(treebase)
+treebase <- read.csv('exampledata/Foresttype_BA.csv')
+summary(treebase)
+names(treebase)[1] <- c("Plot")
+treebase $Plot <- as.factor(treebase $Plot)
+treebase $Fragment <- as.factor(treebase $Fragment)
+treebase $forest.type <- as.factor(treebase $forest.type)
+summary(treebase)
+ggplot(data= treebase, aes(x=longitude, y=latitude, size=BA.ha, colour= forest.type)) + geom_point()
+hist(treebase $BA.ha)
+hist(log(treebase $BA.ha))
+m.rs1 <- gls(log(BA.ha)~ forest.type, data= treebase)
+plot(Variogram(m.rs1, form=~longitude+latitude, resType='n'))
+plot(m.rs1) ## residual homoscedasticity looks okay
+summary(m.rs1) #some group differences significant
+anova(m.rs1)
+m.rs2 <- update(m.rs1, correlation=corExp(form=~ longitude + latitude))
+anova(m.rs1, m.rs2) ## improves model fit
+plot(Variogram(m.rs2, form=~longitude+latitude, resType='n'))
+plot(m.rs2) ## residual homoscedasticity looks okay
+summary(m.rs2)
+anova(m.rs2) #groups no longer different
+m.rs3 <- update(m.rs2, correlation=corExp(form=~longitude + latitude, nugget=T))
+anova(m.rs1, m.rs2, m.rs3) #nugget makes no change in this case
+plot(Variogram(m.rs3, form=~longitude + latitude, resType='n'))
+## variogram barely moves
+#so the model with spatial correction and no nugget seems to fit the data best of the 3 models tested
+#and we conclude that forest type has no effect on plot basal area
+q()
+q()

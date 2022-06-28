@@ -1,0 +1,396 @@
+bark$Phylo <- as.factor(bark$Phylo)
+summary(bark)
+bark
+bark
+phylo_cor <- load("phylo_cor_bark.Rdata") #phylo_cor from phylogeny
+plot(phylo_cor)
+write.csv(bark, "bark.csv")
+bark <- read.csv("bark.csv", header = TRUE, sep = ";", row.names = NULL)
+summary(bark)
+bark <- read.csv("bark.csv", header = TRUE, sep = ",", row.names = NULL)
+summary(bark)
+bark$Species <- as.factor(bark$Species)
+bark$Family <- as.factor(bark$Family)
+bark$Month <- as.factor(bark$Month)
+bark$Function <- as.factor(bark$Function)
+summary(bark)
+phylo <- read.tree("scenario.2_run.1.tre")
+summary(phylo_cor)
+A <- ape::vcv.phylo(phylo)
+library(brms)
+ggplot2::theme_set(theme_default())
+A <- ape::vcv.phylo(phylo)
+phylo <- read.tree("scenario.2_run.1.tre")
+library(ape)
+phylo <- read.tree("scenario.2_run.1.tre")
+plot(phylo)
+A <- ape::vcv.phylo(phylo)
+phylo_cor <- ape::vcv.phylo(phylo)
+summary(phylo_cor)
+plot(density((bark$D)))
+plot(density(sqrt(bark$D)))
+plot(density(log(bark$N)))
+plot(density(log(bark$D)))
+model_Flog <-brm(Dlog~int+(1|phylo_cor)+(1|Species), #
+                  cov_ranef = list(Phylo = phylo_cor),#
+                  data = debark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 20000,warmup = 10000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+model_Flog <-brm(Dlog~int+(1|phylo_cor)+(1|Species), #
+                  cov_ranef = list(Phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 20000,warmup = 10000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+bark $Dlog=log(bark $D)
+summary(bark)
+bark$Species <- as.factor(bark$Species)#
+bark$Family <- as.factor(bark$Family)#
+bark$Month <- as.factor(bark$Month)#
+bark$Function <- as.factor(bark$Function)
+summary(bark)
+phylo_cor <- load("phylo_cor_bark.Rdata") #phylo_cor from phylogeny
+phylo <- read.tree("scenario.2_run.1.tre")
+plot(phylo)
+phylo_cor <- ape::vcv.phylo(phylo)
+summary(phylo_cor)
+bark$Phylo <- bark$Species
+summary(bark)
+plot(density((bark$D)))#
+plot(density(sqrt(bark$D)))#
+plot(density(log(bark$D)))#
+bark $Dlog=log(bark $D)
+par(mfrow=c(1,3))#
+plot(density((bark$D)))#
+plot(density(sqrt(bark$D)))#
+plot(density(log(bark$D)))
+bark $Dlog=log(bark $D)
+bark $int=interaction(bark $Function,debark$Month)
+model_Flog <-brm(Dlog~int+(1|Phylo)+(1|Species), #
+                  cov_ranef = list(Phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 20000,warmup = 10000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+phylo <- ape::read.nexus("https://paul-buerkner.github.io/data/phylo.nex")
+plot(phylo)
+phylo <- read.tree("scenario.2_run.1.tre")
+model_Flog <-brm(Dlog~int+(1|phylo)+(1|Species), #
+                  cov_ranef = list(phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 20000,warmup = 10000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+phylo <- ape::read.nexus("https://paul-buerkner.github.io/data/phylo.nex")
+data_simple <- read.table(#
+  "https://paul-buerkner.github.io/data/data_simple.txt", #
+  header = TRUE#
+)
+dim(data_simple)
+phylo
+plot(phylo)
+A <- ape::vcv.phylo(phylo)
+model_simple <- brm(#
+  phen ~ cofactor + (1|phylo), data = data_simple, #
+  family = gaussian(), cov_ranef = list(phylo = A),#
+  prior = c(#
+    prior(normal(0, 10), "b"),#
+    prior(normal(0, 50), "Intercept"),#
+    prior(student_t(3, 0, 20), "sd"),#
+    prior(student_t(3, 0, 20), "sigma")#
+  )#
+)
+summary(model_simple)
+bark <- read.csv("bark.csv", header = TRUE, sep = ",", row.names = NULL)#
+summary(bark)#
+#
+bark$Species <- as.factor(bark$Species)#
+bark$Family <- as.factor(bark$Family)#
+bark$Month <- as.factor(bark$Month)#
+bark$Function <- as.factor(bark$Function)#
+summary(bark)#
+# loading phylogenetic matrix "phylo_cor"#
+#phylo_cor <- load("phylo_cor_bark.Rdata") #phylo_cor from phylogeny
+phylo <- read.tree("scenario.2_run.1.tre")
+plot(phylo)
+phylo_cor <- ape::vcv.phylo(phylo)#
+summary(phylo_cor)
+dim(phylo_cor)
+par(mfrow=c(1,3))#
+plot(density((bark$D)))#
+plot(density(sqrt(bark$D)))#
+plot(density(log(bark$D)))#
+bark $Dlog=log(bark $D)
+summary(bark)
+bark $int=interaction(bark $Function,debark$Month)
+summary(bark)
+model_Flog <-brm(Dlog~Function+(1|phylo)+(1|Species), #
+                  cov_ranef = list(phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 2000,warmup = 1000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+summary(data_simple)
+bark$phylo <- bark$Species
+summary(bark)
+plot(phylo)
+bark <- read.csv("bark.csv", header = TRUE, sep = ",", row.names = NULL)#
+summary(bark)#
+#
+bark$Species <- as.factor(bark$Species)#
+bark$Family <- as.factor(bark$Family)#
+bark$Month <- as.factor(bark$Month)#
+bark$Function <- as.factor(bark$Function)#
+summary(bark)
+bark <- read.csv("bark.csv", header = TRUE, sep = ",", row.names = NULL)#
+summary(bark)#
+#
+bark$Species <- as.factor(bark$Species)#
+bark$Family <- as.factor(bark$Family)#
+bark$Month <- as.factor(bark$Month)#
+bark$Function <- as.factor(bark$Function)#
+summary(bark)#
+# loading phylogenetic matrix "phylo_cor"#
+#phylo_cor <- load("phylo_cor_bark.Rdata") #phylo_cor from phylogeny#
+phylo <- read.tree("scenario.2_run.1.tre")#
+plot(phylo)#
+#
+#make the covariance matrix from the phylogeny#
+phylo_cor <- ape::vcv.phylo(phylo)#
+dim(phylo_cor)
+par(mfrow=c(1,3))#
+plot(density((bark$D)))#
+plot(density(sqrt(bark$D)))#
+plot(density(log(bark$D)))
+par(mfrow=c(1,3))#
+plot(density((bark$D)))#
+plot(density(sqrt(bark$D)))#
+plot(density(log(bark$D)))
+bark $Dlog=log(bark $D)
+bark $int=interaction(bark $Function,debark$Month)
+summary(bark)
+bark$phylo <- bark$Species
+model_Flog <-brm(Dlog~Function+(1|phylo)+(1|Species), #
+                  cov_ranef = list(phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 2000,warmup = 1000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+phylo <- ape::read.nexus("https://paul-buerkner.github.io/data/phylo.nex")
+plot(phylo)
+summary(phylo)
+summary(data_simple)
+head(data_simple)
+phylo_cor <- load("phylo_cor_bark.Rdata") #phylo_cor from phylogeny
+model_Flog <-brm(Dlog~Function+(1|phylo)+(1|Species), #
+                  cov_ranef = list(phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 2000,warmup = 1000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+summary(phylo)
+phylo <- read.tree("scenario.2_run.1.tre")
+summary(phylo)
+phylo_cor <- ape::vcv.phylo(phylo)
+bark$phylo <- bark$Species
+summary(bark)
+model_Flog <-brm(Dlog~Function+(1|phylo)+(1|Species), #
+                  cov_ranef = list(phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 2000,warmup = 1000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+phylo_cor <- load("phylo_cor_bark.Rdata") #phylo_cor from phylogeny
+summary(phylo_cor)
+phylo_cor
+tree <- read.tree("Phylogeny/scenario.2_run.1.tre")
+tree <- read.tree("scenario.2_run.1.tre")
+plot(tree, cex=.5, label.offset =.1, no.margin = TRUE)
+summary(tree)
+bark <- read.csv("bark.csv", header = TRUE, sep = ",", row.names = NULL)
+summary(bark)
+bark$Species <- as.factor(bark$Species)#
+bark$Family <- as.factor(bark$Family)#
+bark$Month <- as.factor(bark$Month)#
+bark$Function <- as.factor(bark$Function)#
+summary(bark)
+phylo <- read.tree("scenario.2_run.1.tre")
+summary(phylo)
+phylo_cor <- ape::vcv.phylo(phylo)
+is.binary.tree(tree) # there are no polytomies
+tree_random.fixed <- tree_random
+tree_random <- read.tree("scenario.2_run.1.tre")
+tree_random.fixed <- tree_random
+phylo_branch <- compute.brlen(tree_random.fixed, method = "Grafen", power = 1)
+plot(phylo_branch)
+plot(phylo)
+quartz(); plot(phylo_branch)
+quartz(); plot(phylo_branch)
+summary(phylo)
+summary(bark)
+is.binary.tree(tree) #TRUE
+is.ultrametric(phylo_branch) # TRUE
+phylo_cor <- ape::vcv.phylo(phylo)
+phylo_cor <- vcv(phylo_branch, cor = T)
+summary(phylo_cor)
+phylo_cor <- ape::vcv.phylo(phylo)
+dim(phylo_cor)
+summary(phylo_cor)
+bark$phylo <- bark$Species
+par(mfrow=c(1,3))#
+plot(density((bark$D)))#
+plot(density(sqrt(bark$D)))#
+plot(density(log(bark$D)))#
+bark $Dlog=log(bark $D)#
+#factor levels#
+bark $int=interaction(bark $Function,debark$Month)#
+summary(bark)
+model_Flog <-brm(Dlog~Function+(1|phylo)+(1|Species), #
+                  cov_ranef = list(phylo = phylo_cor),#
+                  data = bark, family = gaussian(), sample_prior = TRUE,#
+                  iter = 2000,warmup = 1000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+length(unique(bark$Species))
+dim(bark)
+phylo <- read.tree("scenario.2_run.1.tre")
+plot(phylo)
+summary(phylo)
+length(unique(bark$Species))
+unique(bark$Species)
+=13x4
+13*4
+library(caper)
+#### reduce both data types to the minimum set of common species
+combine<-comparative.data(phylo,bark,Species,vcv=TRUE,na.omit=F)
+unique(tree_random$tip.label)
+bark2 <- subset(bark,Species==unique(tree_random$tip.label))
+n1<-unique(tree_random$tip.label)
+str(n1)
+bark2 <- subset(bark,Species==as.fcator(unique(tree_random$tip.label)))
+bark2 <- subset(bark,Species==as.factor(unique(tree_random$tip.label)))
+unique(tree_random$tip.label)
+bark2 <- bark[bark$Species %in% n1,]
+dim(bark2)
+length(unique(Bark2$Species))
+length(unique(bark2$Species))
+bark2
+n2<-unique(bark2$Species)
+n2
+phylo2<-drop.tip(phylo,phylo$tip.label[match(n2, tree$tip.label)])
+summary(phylo2)
+?drop.tip
+phylo2<-keep.tip(phylo,phylo$tip.label[match(n2, tree$tip.label)])
+summary(phylo2)
+phylo_cor <- ape::vcv.phylo(phylo2)
+summary(phylo_cor)
+bark$phylo2 <- bark$Species
+bark2$phylo2 <- bark2$Species
+summary(bark2)
+par(mfrow=c(1,3))#
+plot(density((bark2$D)))#
+plot(density(sqrt(bark2$D)))#
+plot(density(log(bark2$D)))#
+bark2 $Dlog=log(bark2 $D)#
+#factor levels#
+bark2 $int=interaction(bark2 $Function,debark$Month)#
+summary(bark2)
+bark2 $int=interaction(bark2 $Function,bark2$Month)
+summary(bark2)
+model_Flog <-brm(Dlog~Function+(1|phylo2)+(1|Species), #
+                  cov_ranef = list(phylo = phylo_cor),#
+                  data = bark2, family = gaussian(), sample_prior = TRUE,#
+                  iter = 2000,warmup = 1000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+model_Flog <-brm(Dlog~Function+(1|phylo2)+(1|Species), #
+                  cov_ranef = list(phylo2 = phylo_cor),#
+                  data = bark2, family = gaussian(), sample_prior = TRUE,#
+                  iter = 2000,warmup = 1000, chains = 4, cores = 4,#
+                  thin = 10, save_all_pars = TRUE,seed=T,#
+                  control=list(adapt_delta=0.99))
+summary(model_Flog)
+pp_check(model_Flog, nsamples =100)
+pp_check(model_Flog, type = "intervals_grouped", group = "int")
+pp_check(model_Flog, type = "intervals_grouped", group = "Function")
+pp_check(model_Flog, type = "scatter_avg_grouped", group = "int") + #
+  geom_abline(intercept = 0, slope = 1 , color = "red", lty = 2)
+pp_check(model_Flog, type = "scatter_avg_grouped", group = "Function") + #
+  geom_abline(intercept = 0, slope = 1 , color = "red", lty = 2)
+pp_check(model_Flog, type = "intervals_grouped", group = "Function")
+pp_check(model_Flog, type = "scatter_avg_grouped", group = "Function") + #
+  geom_abline(intercept = 0, slope = 1 , color = "red", lty = 2)
+library(ggplot)
+library(ggplot2)
+pp_check(model_Flog, type = "scatter_avg_grouped", group = "Function") + #
+  geom_abline(intercept = 0, slope = 1 , color = "red", lty = 2)
+library(ggplot2)
+mcmc_plot(model_Flog1, type = "neff")
+mcmc_plot(model_Flog, type = "neff")
+mcmc_plot(model_Flog1, type = "nuts_acceptance")
+mcmc_plot(model_Flog, type = "nuts_acceptance")
+plot(model_Flog, N = 2, ask = FALSE)
+plot(model_Flog, N = 2, ask = FALSE)
+plot(model_Flog, N = 2, ask = FALSE)
+par(mfrow=c(6,2))#
+plot(model_Flog, N = 2, ask = FALSE)
+plot(model_Flog, N = 6, ask = FALSE)
+plot(conditional_effects(model_Flog), points = TRUE)
+summary(model_Flog)
+hyp <- "sd_phylo2__Intercept^2 / (sd_phylo__Intercept^2 + sd_phylo__Species^2 + sigma^2) = 0"
+(hyp <- hypothesis(model_Flog, hyp, class = NULL))
+hyp <- "sd_phylo2__Intercept^2 / (sd_phylo__Intercept^2 + sd_Species__Intercept^2 + sigma^2) = 0"
+(hyp <- hypothesis(model_Flog, hyp, class = NULL))
+hyp <- "sd_phylo2__Intercept^2 / (sd_phylo2__Intercept^2 + sd_Species__Intercept^2 + sigma^2) = 0"
+(hyp <- hypothesis(model_Flog, hyp, class = NULL))
+plot(hyp)
+plot(model_Flog)
+bayes_R2(model_Flog)
+plot(conditional_effects(model_Flog),points=T)
+tidyMCMC(model_Flog1, conf.int = TRUE)
+library(broom)
+chooseCRANmirror()
+install.packages("broom")
+install.packages("broom")
+chooseCRANmirror()
+install.packages("broom")
+chooseCRANmirror()
+install.packages("broom")
+library(broom)
+tidyMCMC(model_Flog, conf.int = TRUE)
+summary(model_Flog)
+library(sjPlot)
+install.packages(sjPlot)
+install.packages("sjPlot")
+library(sjPlot)
+tab_model(model_Flog, show.intercept = T, show.r2 = TRUE, #
+          transform = NULL,show.re.var=T)
+bayes_R2(model_Flog)
+mcmc_plot(model_Flog, pars = c("^b_", "^sd_"))
+plot(conditional_effects(model_Flog), points = TRUE)
+mcmc_plot(model_Flog, pars = c("^b_", "^sd_"))
+plot(conditional_effects(model_Flog), points = TRUE)
+summary(bark2)
+yrep<-as.data.frame(fitted(model_Flog))
+yrep$Function<-debark$Function
+yrep$Function<-bark2$Function
+ggplot()+#
+  geom_boxplot(aes(x = bark2$Function, y= bark2 $Dlog))+#
+  geom_point(aes(x = bark2 $Function, y= bark2 $Dlog))+#
+  geom_boxplot(aes(x = yrep$Function, y=yrep$Estimate),col=2)+#
+  geom_point(aes(x =yrep$Function, y=yrep$Estimate), col=2)
+library(rstan)
+stan_ac(model_Flog$fit)
+icc(model_Flog) %>% print(prob = .95, digits = 3)
+library(dplyr)
+icc(model_Flog) %>% print(prob = .95, digits = 3)
+library(performance)
+icc(model_Flog) %>% print(prob = .95, digits = 3)
+library(MuMIn)
+r.squaredGLMM(model_Flog)
+mcmc_plot(model_Flog, pars = c("^b_", "^sd_"))
+hyp <- "sd_phylo2__Intercept^2 / (sd_phylo2__Intercept^2 + sd_Species__Intercept^2 + sigma^2) = 0"
+(hyp <- hypothesis(model_Flog, hyp, class = NULL))
+plot(hyp)
+q()

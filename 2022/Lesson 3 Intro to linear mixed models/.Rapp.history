@@ -1,0 +1,89 @@
+library(lme4)
+DogID = c(rep(1:16, each = 4))#
+Drug = c(rep(rep(1:2,each = 4),8))#
+DogType = c(rep(1:2,each = 32))#
+Time = c(rep(1:4,16))#
+Yhist = c(12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34,12,46,23,46,18,43,52,65,76,98,13,24,16,78,12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34)
+df1 <- data.frame(DogID,Drug,DogType,Time,Yhist)
+df1$DogID <- as.factor(df1$DogID)#
+df1$Drug <- as.factor(df1$Drug)#
+df1$DogType <- as.factor(df1$DogType)#
+df1$Time <- as.factor(df1$Time)#
+#
+summary(df1)#
+#NOW, as you have seen previously, this problem can be handled with ANOVA#
+#
+mod1 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df1)#
+summary(mod1)
+MM1 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df1)
+summary(MM1)
+anova(MM1)
+summary(mod1)
+Yhist = c(12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,56,34,12,46,23,46,18,43,52,65,76,98,13,24,16,78,12,3,45,NA,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34)
+df2 <- data.frame(DogID,Drug,DogType,Time,Yhist)#
+#
+df2$DogID <- as.factor(df2$DogID)#
+df2$Drug <- as.factor(df2$Drug)#
+df2$DogType <- as.factor(df2$DogType)#
+df2$Time <- as.factor(df2$Time)#
+#
+summary(df2)
+mod2 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df2)
+MM2 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df2)
+summary(MM2)
+anova(MM2)
+anova(MM1)
+library(nlme)
+modlme <- lme(Yhist~Drug*DogType*Time, random= ~1|DogID,df2)
+Block = c(1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5) #
+N = c(1,1,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2,1,1,1,2,2,2)#
+P = c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3)#
+Yield = c(12,3,25,34,45,67,28,34,36,45,67,89,13,24,6,78,75,43,52,65,76,98,48,24,34,12,46,23,46,18)#
+#
+df3 <- data.frame(Block,N,P,Yield)#
+summary(df3)#
+df3$Block <-as.factor(df3$Block)#
+summary(df3)#
+dim(df3)
+M1 <- lmer(Yield~N*P + (1|Block),df3, REML=F)
+summary(M1)
+M2 <- lmer(Yield~N+P + (1|Block),df3, REML=F)
+summary(M2)
+anova(M1,M2)
+-135.19+134.75
+M3 <- lmer(Yield~N + (1|Block),df3, REML=F)
+summary(M3)
+anova(M2,M3)
+M3a <- lmer(Yield~P + (1|Block),df3, REML=F)
+summary(M3a)
+anova(M2,M3a)
+M4 <- lmer(Yield~1 + (1|Block),df3, REML=F)
+summary(M4)
+anova(M3,M4)
+summary(M3)
+q()
+DogID = c(rep(1:16, each = 4))#
+Drug = c(rep(rep(1:2,each = 4),8))#
+DogType = c(rep(1:2,each = 32))#
+Time = c(rep(1:4,16))#
+Yhist = c(12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34,12,46,23,46,18,43,52,65,76,98,13,24,16,78,12,3,45,34,45,67,78,34,56,45,67,89,43,52,65,76,98,13,24,16,78,75,48,24,34)#
+df1 <- data.frame(DogID,Drug,DogType,Time,Yhist)
+df1$DogID <- as.factor(df1$DogID)#
+df1$Drug <- as.factor(df1$Drug)#
+df1$DogType <- as.factor(df1$DogType)#
+df1$Time <- as.factor(df1$Time)#
+#
+summary(df1)#
+#
+#we can handle this with ANOVA#
+mod2 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df2)
+mod2 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df1)
+MM1 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df1)
+library(lme4)
+MM1 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df1)
+summary(MM1)
+anova(MM1)
+mod1 <- aov(Yhist~Drug*DogType*Time+Error(DogID/Time),df1)
+summary(mod1)
+q()
+q()

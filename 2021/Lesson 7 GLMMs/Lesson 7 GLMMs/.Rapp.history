@@ -1,0 +1,697 @@
+rm(list=ls())#
+options(digits=3, width=60)#
+#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 11 Inference with LMMs")#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)#
+library(MuMIn)
+?pvalues
+radon <- read.csv("exampledata/Radon_Data_RB.csv")
+head(radon)
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), #
+                        data=radon)#
+summary(mod.radon.lmer1)
+anova(mod.radon.lmer1) ## no denominator dfs or p values
+mod0 <- update(mod.radon.lmer1, ~.-floor)
+summary(mod0)
+mod1 <- mod.radon.lmer1
+anova(mod0, mod1)
+summary(mod.radon.lmer1) ## 2369 observations
+getME(mod.radon.lmer1, 'devcomp')$dims
+anova(mod.radon.lmer1)
+pf(q=112, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant
+den.df <- 2369 - 2 - 1
+den.df  #2366
+pf(q=112, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant
+den.df <- 2369  -2 - 68#
+den.df  #2299#
+pf(q=112, 1, den.df, lower.tail=FALSE)
+library(pbkrtest)#
+KRmodcomp(mod0, mod1)#
+anova(mod0, mod1)  #likelihood ratio test result
+anova(mod.radon.lmer1)
+a<-KRmodcomp(mod0, mod1)
+getKR(a,'ddf')
+getKR(a,'ddf')
+Anova(mod.radon.lmer1, test='F')
+rm(list=ls())#
+options(digits=3, width=60)#
+#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 11 Inference with LMMs")#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)#
+library(MuMIn)
+rm(list=ls())#
+options(digits=3, width=60)#
+#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 11 Inference with LMMs")#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)#
+library(MuMIn)
+plants <- read.csv('exercises/plantdamage.csv')
+summary(plants)#
+#
+## initial plot#
+ggplot(plants, aes(x=damage, y=growth, colour=light, group=light)) +#
+  geom_smooth(method='lm') + geom_point() +facet_wrap(~shadehouse)#
+#
+## fit the model
+mod.pl.lmer1 <- lmer(growth~damage*light + #
+                       (1|shadehouse), data=plants)
+plot(mod.pl.lmer1, resid(.)~fitted(.)) ## not great; larger fitted values have larger residuals
+plot(mod.pl.lmer1, sqrt(abs(resid(.)))~fitted(.)) ## confirms the heteroscedasticity
+plants$growth2  <- sqrt(plants$growth - #
+                          min(plants$growth))#
+summary(plants)
+mod.pl.lmer2 <- lmer(growth2~damage*light + (1|shadehouse), data=plants)#
+plot(mod.pl.lmer2, resid(.)~fitted(.)) ## better
+ranefs <- ranef(mod.pl.lmer2)$shadehouse#
+qqPlot(ranefs$'(Intercept)') ## not great
+Anova(mod.pl.lmer2, test='F')
+summary(mod.pl.lmer2)
+r.squaredGLMM(mod.pl.lmer2)
+mod.pl.lmer3 <- lmer(growth2~damage+light + (1|shadehouse), data=plants)
+anova(mod.pl.lmer2, mod.pl.lmer3)
+summary(mod.pl.lmer3)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 11 Inference with LMMs")
+plants <- read.csv('exercises/plantdamage.csv')
+## initial plot#
+ggplot(plants, aes(x=damage, y=growth, colour=light, group=light)) +#
+  geom_smooth(method='lm') + geom_point() +facet_wrap(~shadehouse)
+mod.pl.lmer1 <- lmer(growth~damage*light + #
+                       (1|shadehouse), data=plants)
+plot(mod.pl.lmer1, resid(.)~fitted(.)) ## not great; larger fitted values have larger residuals
+summary(plants)
+plants$growth2  <- sqrt(plants$growth - #
+                          min(plants$growth))#
+summary(plants)
+mod.pl.lmer2 <- lmer(growth2~damage*light + (1|shadehouse), data=plants)
+plot(mod.pl.lmer2, resid(.)~fitted(.)) ## better
+plot(mod.pl.lmer2, sqrt(abs(resid(.)))~fitted(.))
+ranefs <- ranef(mod.pl.lmer2)$shadehouse
+qqPlot(ranefs$'(Intercept)') ## not great
+summary(mod.pl.lmer2)
+Anova(mod.pl.lmer2, test='F')
+mod.pl.lmer3 <- lmer(growth2~damage+light + (1|shadehouse), data=plants)
+anova(mod.pl.lmer2, mod.pl.lmer3)
+Anova(mod.pl.lmer2, test='F')
+Anova(mod.pl.lmer3, test='F')
+summary(mod.pl.lmer3)
+mod.pl.lmer4 <- lmer(growth2~damage*light + #
+                       (1+damage|shadehouse), data=plants)
+summary(mod.pl.lmer4)
+confint.result <- confint(mod.pl.lmer4, method='boot', nsim = 499)
+confint.result
+summary(mod.radon.lmer1)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 11 Inference with LMMs")
+radon <- read.csv("exampledata/Radon_Data_RB.csv")#
+head(radon)#
+dim(radon)#
+#
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), #
+                        data=radon)#
+summary(mod.radon.lmer1)#
+#
+anova(mod.radon.lmer1) ## no denominator dfs or p values#
+#
+mod0 <- update(mod.radon.lmer1, ~.-floor)#
+mod1 <- mod.radon.lmer1#
+#
+anova(mod0, mod1)#
+#
+## can estimate them from the number of replicates#
+## First assume that all houses are fully independent of one another#
+summary(mod.radon.lmer1) ## 2369 observations#
+#
+## so lets make a stab at the denominator df#
+getME(mod.radon.lmer1, 'devcomp')$dims #
+## number of random effect parameters = nth = 1#
+?getME#
+#N (# observations/ sampling units)#
+#p (# fixed parameters)= 2, #
+#nth (# random effects) = 1,#
+#q (# random levels) = 68#
+#if we assume fixed effects parameters only then: #
+den.df <- 2369 - 2 - 1 #
+den.df  #2366#
+#
+## now calculate p value for floor#
+anova(mod.radon.lmer1)#
+#
+## perform an f-test for floor effect#
+pf(q=112, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant#
+#
+## but houses are not independent#
+## more conservatively, let's assume each random level takes a df. Then: #
+#
+den.df <- 2369  -2 - 68#
+den.df  #2299#
+pf(q=112, 1, den.df, lower.tail=FALSE) #
+## in this case there is not much difference here from the previous calculation. Why? #
+## (think about the total df..)#
+## Using the Kenward-Rodgers approximation of den DFs#
+library(pbkrtest)#
+KRmodcomp(mod0, mod1)#
+anova(mod0, mod1)  #likelihood ratio test result#
+#
+a<-KRmodcomp(mod0, mod1)#
+getKR(a,'ddf')#
+#
+2299+(2366-2298)/2  #
+#2333. This random effects model is quite simple. Hence our ability to calculate the answer. The calculations are more convoluted for complex random effects (nesting, crossed)#
+#
+## the car library also allows one to test mixed models with KR df#
+Anova(mod.radon.lmer1, test='F')#
+##********* BACK TO POWERPOINT *********###
+##############################
+## Code 11.2#
+###############################
+## finding confidence intervals for parameter estimates#
+## using bootstrapping is one way to evaluate the significance#
+## of parameter estimates (both means and variances)#
+#
+##To understand bootstrapping you might find these resources useful#
+##https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#
+##http://www.ats.ucla.edu/stat/r/library/bootstrap.htm#
+##http://www.r-bloggers.com/bootstrap-confidence-intervals/#
+##http://www.statmethods.net/advstats/bootstrapping.html#
+#
+summary(mod.radon.lmer1)
+confint.result <- confint(mod.radon.lmer1, method='boot', nsim = 499) ## has a number of options
+confint.result
+summary(mod.radon.lmer1)
+mods <- replicate(499, {
+## produce a number of models#
+mods <- replicate(499, {#
+  newresp <- simulate(mod.radon.lmer1)#
+  newmod <- refit(mod.radon.lmer1, newresp)}, #
+  simplify=FALSE)
+mods
+fixef.sims <- sapply(mods, fixef)
+fixef.sims
+apply(fixef.sims, 1, quantile, c(0.025, 0.975))
+confint.result
+?confint
+??verification
+polls <- read.csv('exampledata/pollsdata_day2.csv', h=T)
+setwd("//Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 12 GLMMs")
+polls <- read.csv('exampledata/pollsdata_day2.csv', h=T)
+source("glmm_helper_funcs.R")
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(verification)#
+library(lattice)#
+library(arm)#
+library(car)
+summary(polls)
+head(polls,20)
+## we want to convert a few of the columns to factors#
+polls$state <- as.factor(polls$state)#
+polls$edu <- as.factor(polls$edu)#
+polls$female <- as.factor(polls$female)#
+polls$black <- as.factor(polls$black)
+summary(polls) ## more useful summary
+mod.polls.glm1 <- glm(bush ~ female + black, #
+                      data=polls, #
+                      family=binomial(link=logit))
+summary(mod.polls.glm1)
+ggplot(data=polls, aes(x=female, y=bush, #
+                       group=black, col=black)) + #
+   geom_smooth(method='glm', method.args =list(family='binomial')) +#
+  theme_bw()
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(verification)#
+library(lattice)#
+library(arm)#
+library(car)#
+## some functions that will help with these exercises#
+source("glmm_helper_funcs.R")#
+## Read in the data#
+polls <- read.csv('exampledata/pollsdata_day2.csv', h=T)#
+head(polls,20)#
+summary(polls)#
+dim(polls)#
+## we want to convert a few of the columns to factors#
+polls$state <- as.factor(polls$state)#
+polls$edu <- as.factor(polls$edu)#
+polls$female <- as.factor(polls$female)#
+polls$black <- as.factor(polls$black)#
+summary(polls) ## more useful summary#
+###########################
+## Exercise 12.1: Fitting a GLM#
+############################
+## now let us model the voting for bush as a function of#
+##  race and sex#
+mod.polls.glm1 <- glm(bush ~ female + black, #
+                      data=polls, #
+                      family=binomial(link=logit))#
+summary(mod.polls.glm1)#
+ggplot(data=polls, aes(x=female, y=bush, #
+                       group=black, col=black)) + #
+   geom_smooth(method='glm', method.args =list(family='binomial')) +#
+  theme_bw()
+ggplot(data=polls, aes(x=female, y=bush, #
+                       group=black, col=black)) + #
+  geom_smooth(method='glm', method.args =list(family='binomial')) +#
+  theme_bw()+ facet_wrap(~state)
+mod.polls.glmm1 <- glmer(bush ~ female + black + #
+                           (1|state), #
+    famil
+y=binomial(link=logit), data=polls)
+mod.polls.glmm1 <- glmer(bush ~ female + black + #
+                           (1|state), #
+    family=binomial(link=logit), data=polls)
+summary(mod.polls.glmm1)
+pest <- read.csv('exercises/Pesticide.csv')#
+summary(pest)#
+mod.pest.glmer1 <- glmer(N~trt + (1|station), #
+                         family=poisson, data=pest)
+# first set up the data frame#
+preddat.pest <- expand.grid(trt=levels(pest$trt),#
+                            station=37)#
+preddat.pest
+levs <- levels(getME(mod.pest.glmer1, 'flist')$station)#
+length(levs)#
+preddat.pest$station <- factor(preddat.pest$station, #
+                               levels=levs)#
+preddat.pest$station
+## now get out the model matrices#
+form.pest <- formula(mod.pest.glmer1, fixed.only=TRUE)#
+form.pest <- update(form.pest, NULL~.)#
+form.pest#
+predmat.pest <- model.matrix(form.pest, preddat.pest)#
+predmat.pest#
+## random effects#
+ranefmat.pest <- model.matrix(~0+station, data=preddat.pest)#
+ranefmat.pest
+## predictions on linear predictor scale#
+preddat.pest$pred.new <- predmat.pest %*% #
+  fixef(mod.pest.glmer1)#
+preddat.pest$pred.known <- predmat.pest %*% fixef(mod.pest.glmer1)+#
+  ranefmat.pest %*% as.matrix(ranef(mod.pest.glmer1)$station)
+## now get the confidence intervals#
+## standard errors first#
+vcv.pest <- vcov(mod.pest.glmer1)#
+vc.pest <- as.data.frame(VarCorr(mod.pest.glmer1))#
+se.pest.known <- sqrt(diag(predmat.pest %*% vcv.pest %*% #
+                             t(predmat.pest)))#
+se.pest.new <- sqrt(#
+  diag(predmat.pest %*% vcv.pest %*% t(predmat.pest))+#
+    vc.pest[vc.pest$grp=='station', 'vcov'])#
+#
+se.pest.known#
+se.pest.new ## much larger
+## confidence intervals#
+preddat.pest$lcl.new <- exp(preddat.pest$pred.new -#
+                              se.pest.new*1.96)#
+preddat.pest$ucl.new <- exp(preddat.pest$pred.new + #
+                              se.pest.new*1.96)#
+preddat.pest#
+preddat.pest$lcl.known <- exp(preddat.pest$pred.known -#
+                                se.pest.known*1.96 )#
+preddat.pest$ucl.known <- exp(preddat.pest$pred.known +#
+                                se.pest.known*1.96)#
+preddat.pest$pred.new <- exp(preddat.pest$pred.new)#
+preddat.pest$pred.known <- exp(preddat.pest$pred.known)#
+preddat.pest
+ggplot(preddat.pest, aes(x=trt, y=pred.new, ymin=lcl.new, #
+                         ymax=ucl.new)) +#
+  geom_errorbar(col=2) + geom_point(col=2) +#
+  geom_errorbar(aes(y=pred.known, ymin=lcl.known, #
+                         ymax=ucl.known)) +#
+  geom_point(aes(y=pred.known), col='blue')
+plants2 <- read.csv('exercises/plantdamage2.csv')
+summary(plants2)
+plants2$deaths <- 4 - plants2$survs#
+mod.pl.glmer1 <- glmer(cbind(survs, deaths) ~ light * damage +#
+                         (1|shadehouse), family=binomial, #
+                       data=plants2)#
+summary(mod.pl.glmer1)
+plants2 <- read.csv('exercises/plantdamage2.csv')#
+#
+summary(plants2)#
+#
+plants2$deaths <- 4 - plants2$survs#
+mod.pl.glmer1 <- glmer(cbind(survs, deaths) ~ light * damage +#
+                         (1|shadehouse), family=binomial, #
+                       data=plants2)#
+summary(mod.pl.glmer1)
+preddat.surv <- expand.grid(light=c('D', 'L'),#
+                            damage=seq(0, 0.25, 0.05),#
+                            shadehouse=1:4)
+preddat.surv#
+summary(preddat.surv)#
+##put out the levels for shade-house#
+levs <- levels(getME(mod.pl.glmer1, 'flist')$shadehouse)#
+levs#
+preddat.surv$shadehouse <- factor(preddat.surv$shadehouse,#
+                                  levels=levs)#
+summary(preddat.surv$shadehouse)
+## get the model matrices#
+## add survs and deaths to help model matrix construction#
+form.surv <- formula(mod.pl.glmer1, fixed.only=TRUE)#
+form.surv <- update(form.surv, NULL~.) ## remove LHS#
+predmat.surv <- model.matrix(form.surv, #
+                             data=preddat.surv)#
+head(predmat.surv)#
+#
+ranefmat.surv <- model.matrix(~0+shadehouse, #
+                              data=preddat.surv)#
+head(ranefmat.surv)
+preddat.surv$pred.new <- predmat.surv %*% #
+  fixef(mod.pl.glmer1)#
+#
+summary(preddat.surv)#
+preddat.surv$pred.known <- predmat.surv %*%#
+  fixef(mod.pl.glmer1) +#
+  ranefmat.surv %*% #
+  as.matrix(ranef(mod.pl.glmer1)$shadehouse)#
+summary(preddat.surv)
+vcv.surv <- vcov(mod.pl.glmer1) ## pull out variance-covariance matrix#
+vcv.surv#
+## calculate diag(XVX^t)^0.5#
+se.known <- sqrt(diag(predmat.surv %*% vcv.surv %*% #
+                        t(predmat.surv)))#
+se.known
+vc.surv <- as.data.frame(VarCorr(mod.pl.glmer1))#
+vc.surv#
+se.new <- sqrt(#
+  diag(predmat.surv %*% vcv.surv %*% t(predmat.surv)) +#
+    vc.surv[vc.surv$grp=='shadehouse', 'vcov'])#
+se.new#
+se.known
+## now get the predictions on the probability scale#
+preddat.surv$ucl.new <- plogis(preddat.surv$pred.new +#
+                                 se.new*1.96)#
+preddat.surv$lcl.new <- plogis(preddat.surv$pred.new -#
+                                 se.new*1.96)#
+preddat.surv$ucl.known <- plogis(preddat.surv$pred.known +#
+                                   se.known*1.96)#
+preddat.surv$lcl.known <- plogis(preddat.surv$pred.known -#
+                                   se.known*1.96)#
+## finally - convert the predicted values to the #
+## data scale#
+preddat.surv$pred.new <- plogis(preddat.surv$pred.new)#
+preddat.surv$pred.known <- plogis(preddat.surv$pred.known)#
+head(preddat.surv)
+p1 <- ggplot(preddat.surv, aes(x=damage, #
+                               y=pred.new, colour=light, #
+                               ymax=ucl.new, ymin=lcl.new)) +#
+  geom_smooth(stat='identity') +#
+  facet_wrap(~shadehouse) + theme_bw()#
+p1
+p2 <- ggplot(preddat.surv, aes(x=damage, y=pred.known, colour=light,#
+                               ymax=ucl.known, ymin=lcl.known)) +#
+  geom_smooth(stat='identity') +#
+  facet_wrap(~shadehouse) + theme_bw()
+p2
+p1 + geom_smooth(stat='identity', aes(y=pred.known,#
+                    ymax=ucl.known, ymin=lcl.known),#
+                 fill='lightpink') +#
+  theme_bw()
+xmat <- model.matrix(~light*damage, data=plants2)#
+plants2$shadehouse <- factor(plants2$shadehouse)#
+plants2$shadehouse2 <- sample(plants2$shadehouse)#
+zmat <- model.matrix(~0+shadehouse, data=plants2)#
+zmat2 <- model.matrix(~0+shadehouse2, data=plants2)#
+beta <- fixef(mod.pl.glmer1)#
+bshade <- rnorm(10, 0, sd=3)#
+plants2$surv.sim1 <- rbinom(nrow(plants2), #
+                              size=4,#
+                               prob=plogis(xmat %*% beta+#
+                                zmat %*% bshade))#
+plants2$surv.sim2 <- rbinom(nrow(plants2), #
+                            size=4,#
+                            prob=plogis(xmat %*% beta+#
+                                          zmat2 %*% bshade))
+mod.sim1 <- glmer(cbind(surv.sim1, 4-surv.sim1)~light*damage+ (1|shadehouse), #
+                    data=plants2, family=binomial)#
+#
+mod.sim2 <- glmer(cbind(surv.sim2, 4-surv.sim2)~light*damage+ (1|shadehouse2), #
+                  data=plants2, family=binomial)#
+#
+sqrt(diag(vcov(mod.sim1)))#
+sqrt(diag(vcov(mod.sim2)))#
+summary(mod.sim1)$coef#
+summary(mod.sim2)$coef
+p2
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(verification)#
+library(lattice)#
+library(arm)#
+library(car)#
+## some functions that will help with these exercises#
+source("glmm_helper_funcs.R")#
+## Read in the data#
+polls <- read.csv('exampledata/pollsdata_day2.csv', h=T)#
+head(polls,20)#
+summary(polls)#
+dim(polls)#
+## we want to convert a few of the columns to factors#
+polls$state <- as.factor(polls$state)#
+polls$edu <- as.factor(polls$edu)#
+polls$female <- as.factor(polls$female)#
+polls$black <- as.factor(polls$black)#
+summary(polls) ## more useful summary#
+###########################
+## Exercise 12.1: Fitting a GLM#
+############################
+## now let us model the voting for bush as a function of#
+##  race and sex#
+mod.polls.glm1 <- glm(bush ~ female + black, #
+                      data=polls, #
+                      family=binomial(link=logit))#
+summary(mod.polls.glm1)#
+ggplot(data=polls, aes(x=female, y=bush, #
+                       group=black, col=black)) + #
+   geom_smooth(method='glm', method.args =list(family='binomial')) +#
+  theme_bw() #
+##********* BACK TO POWERPOINT *********###
+##################################################
+## Exercise 12.2#
+## Fitting a GLMM #
+#################################################
+ggplot(data=polls, aes(x=female, y=bush, #
+                       group=black, col=black)) + #
+  geom_smooth(method='glm', method.args =list(family='binomial')) +#
+  theme_bw()+ facet_wrap(~state)#
+#pattern more nuanced when treated by state#
+mod.polls.glmm1 <- glmer(bush ~ female + black + #
+                           (1|state), #
+    family=binomial(link=logit), data=polls)#
+summary(mod.polls.glmm1)#
+##********* BACK TO POWERPOINT *********###
+## What do the model coefficients mean?#
+fixef(mod.polls.glmm1)#
+## probability of a non-black male voting for bush?#
+plogis(0.4377) ## approx 61%#
+## probability of a non-black female voting for Bush?#
+plogis(0.4377 - 0.0931) ## = 58.5%; but probably no difference given z is NS#
+############################################
+## Exercise 12.3#
+#############################################
+# what is the effect of age on probability of voting for Bush?#
+mod.x2.1 <- glmer(bush~age+female + (1|state),#
+                  family=binomial(link='logit'),#
+                  data=polls)
+summary(mod.x2.1)
+fixef(mod.x2.1)
+est <- fixef(mod.x2.1)['(Intercept)'] + #
+  fixef(mod.x2.1)['age.s']*20
+est
+est <- fixef(mod.x2.1)['(Intercept)'] + #
+  fixef(mod.x2.1)['age']*20
+est
+plogis(est)
+summary(mod.x2.1)
+mod.x2.2 <- glmer(bush~age + female + #
+                  (1+female|state),#
+                  family=binomial(link='logit'),#
+                  data=polls)
+summary(mod.x2.2) ## not much
+vc.surv <- as.data.frame(VarCorr(mod.pl.glmer1))#
+vc.surv#
+se.new <- sqrt(#
+  diag(predmat.surv %*% vcv.surv %*% t(predmat.surv)) +#
+    vc.surv[vc.surv$grp=='shadehouse', 'vcov'])#
+se.new#
+se.known
+p1 <- ggplot(preddat.surv, aes(x=damage, y=pred.new, colour=light, ymax=ucl.new, ymin=lcl.new)) + geom_smooth(stat='identity') +#
+  facet_wrap(~shadehouse) + theme_bw()#
+p1
+p2
+p2 <- ggplot(preddat.surv, aes(x=damage, y=pred.known, colour=light,ymax=ucl.known, ymin=lcl.known)) + geom_smooth(stat='identity') +#
+  facet_wrap(~shadehouse) + theme_bw()#
+p2
+# now both on the same figure#
+p1 + geom_smooth(stat='identity', aes(y=pred.known,ymax=ucl.known, ymin=lcl.known),#
+ fill='lightpink') +theme_bw()
+setwd("//Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 12 GLMMs")#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(verification)#
+library(lattice)#
+library(arm)#
+library(car)#
+## some functions that will help with these exercises#
+source("glmm_helper_funcs.R")#
+## Read in the data#
+polls <- read.csv('exampledata/pollsdata_day2.csv', h=T)#
+head(polls,20)#
+summary(polls)#
+dim(polls)#
+## we want to convert a few of the columns to factors#
+polls$state <- as.factor(polls$state)#
+polls$edu <- as.factor(polls$edu)#
+polls$female <- as.factor(polls$female)#
+polls$black <- as.factor(polls$black)#
+summary(polls) ## more useful summary#
+###########################
+## Exercise 12.1: Fitting a GLM#
+############################
+## now let us model the voting for bush as a function of#
+##  race and sex#
+mod.polls.glm1 <- glm(bush ~ female + black, #
+                      data=polls, #
+                      family=binomial(link=logit))#
+summary(mod.polls.glm1)#
+ggplot(data=polls, aes(x=female, y=bush, #
+                       group=black, col=black)) + #
+   geom_smooth(method='glm', method.args =list(family='binomial')) +#
+  theme_bw() #
+##********* BACK TO POWERPOINT *********###
+##################################################
+## Exercise 12.2#
+## Fitting a GLMM #
+#################################################
+ggplot(data=polls, aes(x=female, y=bush, #
+                       group=black, col=black)) + #
+  geom_smooth(method='glm', method.args =list(family='binomial')) +#
+  theme_bw()+ facet_wrap(~state)#
+#pattern more nuanced when treated by state#
+mod.polls.glmm1 <- glmer(bush ~ female + black + #
+                           (1|state), #
+    family=binomial(link=logit), data=polls)#
+summary(mod.polls.glmm1)#
+##********* BACK TO POWERPOINT *********###
+## What do the model coefficients mean?#
+fixef(mod.polls.glmm1)#
+## probability of a non-black male voting for bush?#
+plogis(0.4377) ## approx 61%#
+## probability of a non-black female voting for Bush?#
+plogis(0.4377 - 0.0931) ## = 58.5%; but probably no difference given z is NS#
+############################################
+## Exercise 12.3#
+#############################################
+# what is the effect of age on probability of voting for Bush?#
+mod.x2.1 <- glmer(bush~age+female + (1|state),#
+                  family=binomial(link='logit'),#
+                  data=polls)#
+## ignoring the NS probability, the effect of age: #
+## older people slightly less likely to vote Bush#
+summary(mod.x2.1)#
+fixef(mod.x2.1)#
+## often get convergence warnings with these models. One thing that#
+## MAY help with this is centering and standardising continuous predictors#
+polls$age.s <- (polls$age-mean(polls$age))/#
+  (sd(polls$age))#
+mod.x2.1 <- glmer(bush~age.s+female + (1|state),#
+                  family=binomial(link='logit'),#
+                  data=polls)#
+## ignoring the NS probability for the effect of age: older people slightly less likely to vote Bush#
+#
+summary(mod.x2.1)#
+fixef(mod.x2.1) #
+## Probability of a 20 year old man voting for Bush...#
+est <- fixef(mod.x2.1)['(Intercept)'] + #
+  fixef(mod.x2.1)['age']*20#
+est#
+plogis(est)#
+## this demonstrates how to calculate the values, #
+## but of course you would not predict these estimates #
+## until after formal significance testing of the coefficients#
+## does the slope vary much between states for female voters?#
+mod.x2.2 <- glmer(bush~age + female + #
+                  (1+female|state),#
+                  family=binomial(link='logit'),#
+                  data=polls)#
+summary(mod.x2.2) ## not much         #
+##********* BACK TO POWERPOINT *********###
+#########################################################
+## Exercise 12.4: GLMM diagnostics#
+########################################################
+## returning to the first model we fitted#
+mod.polls.glmm1 <- glmer(bush ~ female + black + #
+                           (1+female|state), family=binomial,data=polls)#
+summary(mod.polls.glmm1)#
+## plots
+plot(mod.polls.glmm1, resid(., type='pearson')~fitted(.))
+binnedplot(x=fitted(mod.polls.glmm1), #
+           y=resid(mod.polls.glmm1, type='pearson'))
+chisq <- sum(resid(mod.polls.glmm1, type='pearson')^2)
+mod.dims <- getME(mod.polls.glmm1, 'devcomp')$dims
+mod.dims
+summary(mod.polls.glmm1)
+mod.dims
+chisq/df.res ## >> 1 would mean overdispersed; our data looks fine
+df.res <- mod.dims['n'] - mod.dims['p'] - mod.dims['nth']
+chisq/df.res ## >> 1 would mean overdispersed; our data looks fine
+overDispTest(mod.polls.glmm1)
+df.residual(mod.polls.glmm1)
+ranefs1 <- ranef(mod.polls.glmm1)$state[,('(Intercept)')]#
+ranefs2 <- ranef(mod.polls.glmm1)$state$female
+par(mfrow=c(1,2))#
+qqPlot(ranefs1, col=2); qqPlot(ranefs2, col=2);
+qqmath(ranef(mod.polls.glmm1), type=c('p', 'r'))
+dotplot(ranef(mod.polls.glmm1, condVar=T))
+pest <- read.csv('exercises/Pesticide.csv')#
+summary(pest)
+ggplot(pest, aes(x=trt, y=N+1, group=trt))+#
+    geom_boxplot() + coord_trans(y='log')+#
+  facet_wrap(~station)
+mod.pest.glmm1 <- glmer(N~trt + (1|station), data=pest,family=poisson(link=log))
+overDispTest(mod.pest.glmm1)  ## a little overdispersed  ;-) :P
+plot(mod.pest.glmm1, resid(., type='pearson')~fitted(.),#
+     type=c('smooth', 'p'), abline=0)
+## checking the random effects#
+qqmath(ranef(mod.pest.glmm1, whichel='station'), #
+       type=c('p', 'r')) ## they look ok
+plot(mod.pest.glmm1, resid(., type='pearson')~fitted(.),#
+     type=c('smooth', 'p'), abline=0)
+hist(pest$Nseeds)
+mod.pest.glmm2 <- update(mod.pest.glmm1, ~.+log(Nseeds))
+summary(mod.pest.glmm2) ## no effect of number of seeds
+mod.pest.glmm3 <- glmer(N~trt + (1|station)+ (1|indx), data=pest,family=poisson(link=log))
+pest$indx <- 1:nrow(pest)
+summary(pest)
+mod.pest.glmm3 <- glmer(N~trt + (1|station)+ (1|indx), data=pest,family=poisson(link=log))
+overDispTest(mod.pest.glmm3)  ## now very underdispersed
+plot(mod.pest.glmm3, resid(., 'pearson')~fitted(.), #
+     type=c('p', 'smooth'), abline=0)
+qqmath(ranef(mod.pest.glmm3, whichel='station'), type=c('p', 'r'))#
+qqmath(ranef(mod.pest.glmm3, whichel='indx'), type=c('p', 'r'))
+summary(pest)
+confint(mod.pest.glmm1, method='boot', nsim=99,parallel='snow') ## takes a little time
+confint(mod.pest.glmm3, method='boot', nsim=99,parallel='snow') ## takes a little time
+q()

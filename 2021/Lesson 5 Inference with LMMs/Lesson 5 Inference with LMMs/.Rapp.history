@@ -1,0 +1,392 @@
+ranefs <- ranef(mod.pl.lmer2)$shadehouse#
+qqPlot(ranefs$'(Intercept)')
+qqPlot(mod.pl.lmer2$resid)
+resid<-mod.pl.lmer2$resid
+str(mod.pl.lmer2)
+mod.pl.lmer2$resids
+resids<-resid(mod.pl.lmer2,type='pearson')
+qqPlot(resids)
+ranefs <- ranef(mod.pl.lmer2)$shadehouse
+qqPlot(ranefs$'(Intercept)') ## not great
+mod.pl.lmer3 <- lmer(growth2~damage+light + (1|shadehouse), data=plants)
+anova(mod.pl.lmer2, mod.pl.lmer3)
+summary(mod.pl.lmer3)
+mod.pl.lmer4 <- lmer(growth2~damage + (1|shadehouse), data=plants)
+anova(mod.pl.lmer3, mod.pl.lmer4)
+anova(mod.pl.lmer2)
+getME(mod.pl.lmer2, 'devcomp')$dims
+dendf.nc = 103-4-1
+dendf.nc
+pf(q= 50.14, df1=1, df2=dendf.nc, lower.tail=FALSE)
+pf(q= 55.64, df1=1, df2=dendf.nc, lower.tail=FALSE)
+pf(q= 1.95, df1=1, df2=dendf.nc, lower.tail=FALSE)
+dendf.c = 103-4-10
+dendf.c
+pf(q= 50.14, df1=1, df2=dendf.c, lower.tail=FALSE)
+pf(q= 55.64, df1=1, df2=dendf.c, lower.tail=FALSE)
+pf(q= 1.95, df1=1, df2=dendf.c, lower.tail=FALSE)
+Anova(mod.pl.lmer2, test='F')
+summary(mod.radon.lmer1)
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 11 Inference with LMMs")#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)#
+library(MuMIn)#
+#
+?pvalues#
+##********* BACK TO POWERPOINT *********###
+#
+#######################################
+#### Code 11.1: inferences in lmer and p values#
+########################################
+radon <- read.csv("exampledata/Radon_Data_RB.csv")#
+head(radon)#
+dim(radon)#
+#
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)#
+summary(mod.radon.lmer1)
+confint.result <- confint(mod.radon.lmer1, method='boot', nsim = 499) ## has a number of options
+confint.result
+mods <- replicate(499, {#
+  newresp <- simulate(mod.radon.lmer1)#
+  newmod <- refit(mod.radon.lmer1, newresp)}, #
+  simplify=FALSE)
+fixef.sims <- sapply(mods, fixef)
+fixef.sims
+apply(fixef.sims, 1, quantile, c(0.025, 0.975))
+confint.result
+set.seed(5)
+rnorm(4,2,3)
+anova(mod0, mod1)
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)#
+summary(mod.radon.lmer1)#
+#
+anova(mod.radon.lmer1) ## no denominator dfs or p values#
+#
+#LRT?#
+mod0 <- update(mod.radon.lmer1, ~.-floor)#
+summary(mod0)#
+#
+mod1 <- mod.radon.lmer1
+anova(mod0, mod1)
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)
+summary(mod.radon.lmer1)
+mod.pl.lmer4 <- lmer(growth2~damage*light + #
+                       (1+damage|shadehouse), data=plants)#
+summary(mod.pl.lmer4)
+confint.result <- confint(mod.pl.lmer4, method='boot', nsim = 499)#
+confint.result
+ggplot(plants, aes(x=damage, y=growth, colour=light, group=light)) +#
+  geom_smooth(method='lm') + geom_point() +facet_wrap(~shadehouse)
+summary(mod.pl.lmer4)
+confint.result
+##############################
+## Inference with LMMs#
+##############################
+#
+## CODE from Robert Bagchi (University of Connecticut)#
+#
+rm(list=ls())#
+options(digits=3, width=60)#
+#
+setwd("/Users/kyletomlinson/Dropbox/Teaching/ATBC advanced stats 2017/Lectures/Lesson 7 Inference with LMMs")#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)#
+library(MuMIn)#
+#
+?pvalues
+setwd("/Users/kyletomlinson/Dropbox/Teaching/XTBG advanced stats 2018/Lectures/Lesson 7 Inference with LMMs")
+?pvalues
+radon <- read.csv("exampledata/Radon_Data_RB.csv")#
+head(radon)#
+dim(radon)
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)
+summary(mod.radon.lmer1)
+mod0 <- update(mod.radon.lmer1, ~.-floor)
+summary(mod0)
+mod1 <- mod.radon.lmer1
+anova(mod0, mod1)
+summary(mod.radon.lmer1) ## 2369 observations
+getME(mod.radon.lmer1, 'devcomp')$dims
+den.df <- 2369 - 2 - 1
+den.df  #2366
+anova(mod.radon.lmer1)
+pf(q=112, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant
+anova(mod.radon.lmer1)
+den.df <- 2369  -2 - 68
+den.df  #2299
+pf(q=112, 1, den.df, lower.tail=FALSE)
+library(pbkrtest)
+KRmodcomp(mod0, mod1)
+a<-KRmodcomp(mod0,mod1)
+getKR(a,'ddf')
+Anova(mod.radon.lmer1, test='F')
+setwd("/Users/kyletomlinson/Dropbox/Teaching/XTBG advanced stats 2018/Lectures/Lesson 7 Inference with LMMs exercises")
+setwd("/Users/kyletomlinson/Dropbox/Teaching/XTBG advanced stats 2018/Lectures/Lesson 7 Inference with LMMs")
+?confint
+newresp <- simulate(mod.radon.lmer1)
+newresp
+newmod <- refit(mod.radon.lmer1, newresp)
+newmod
+mod.pl.lmer1 <- lmer(growth~damage*light + (1|shadehouse), data=plants)
+plants <- read.csv('exercises/plantdamage.csv')
+mod.pl.lmer1 <- lmer(growth~damage*light + (1|shadehouse), data=plants)
+summary(mod.pl.lmer1)
+#CHECK RESIDUALS#
+plot(mod.pl.lmer1, resid(.)~fitted(.)) ## not great; larger fitted values have larger residuals#
+plot(mod.pl.lmer1, sqrt(abs(resid(.)))~fitted(.)) ## confirms the heteroscedasticity#
+plot(mod.pl.lmer1, resid(.)~fitted(.)|light) ## variance greater in light treatment#
+#
+hist(plants$growth)#
+#
+plants$growth2  <- sqrt(plants$growth - #
+                          min(plants$growth))#
+#
+summary(plants)#
+#
+mod.pl.lmer2 <- lmer(growth2~damage*light + (1|shadehouse), data=plants)#
+plot(mod.pl.lmer2, resid(.)~fitted(.)) ## better#
+plot(mod.pl.lmer2, sqrt(abs(resid(.)))~fitted(.)) ## better#
+plot(mod.pl.lmer2, resid(.)~fitted(.)|light) ## better#
+#
+resids<-resid(mod.pl.lmer2,type='pearson')#
+qqPlot(resids)
+ranefs <- ranef(mod.pl.lmer2)$shadehouse#
+qqPlot(ranefs$'(Intercept)') ## not great
+mod.pl.lmer2 <- lmer(growth2~damage*light + (1|shadehouse), data=plants)
+mod.pl.lmer3 <- lmer(growth2~damage+light + (1|shadehouse), data=plants)
+anova(mod.pl.lmer2, mod.pl.lmer3)
+summary(mod.pl.lmer3)#
+#
+##now check them further with LRTs...#
+mod.pl.lmer4 <- lmer(growth2~damage + (1|shadehouse), data=plants)#
+#
+anova(mod.pl.lmer3, mod.pl.lmer4)#
+#light has a significant effect on the likelihood of the model
+anova(mod.pl.lmer2)
+getME(mod.pl.lmer2, 'devcomp')$dims
+pf(q= 50.14, df1=1, df2=dendf.nc, lower.tail=FALSE)
+dendf.nc = 103-4-1
+pf(q= 50.14, df1=1, df2=dendf.nc, lower.tail=FALSE)
+pf(q= 55.64, df1=1, df2=dendf.nc, lower.tail=FALSE)
+dendf.c = 103-4-10
+Anova(mod.pl.lmer2, test='F')
+dendf.nc = 10-2-1
+dendf.nc1 = 103-4-1
+dendf.nc2 = 10-2-1
+pf(q= 50.14, df1=1, df2=dendf.nc1, lower.tail=FALSE)#
+#light#
+pf(q= 55.64, df1=1, df2=dendf.nc2, lower.tail=FALSE)#
+#damage:light#
+pf(q= 1.95, df1=1, df2=dendf.nc1, lower.tail=FALSE)
+dendf.c1 = 103-4-10#
+dendf.c2 = 10-2#
+#damage#
+pf(q= 50.14, df1=1, df2=dendf.c1, lower.tail=FALSE)#
+#light#
+pf(q= 55.64, df1=1, df2=dendf.c2, lower.tail=FALSE)#
+#damage:light#
+pf(q= 1.95, df1=1, df2=dendf.c1, lower.tail=FALSE)
+pf(q= 50.14, df1=1, df2=dendf.nc1, lower.tail=FALSE)#
+#light#
+pf(q= 55.64, df1=1, df2=dendf.nc2, lower.tail=FALSE)#
+#damage:light#
+pf(q= 1.95, df1=1, df2=dendf.nc1, lower.tail=FALSE)
+mod.pl.lmer1 <- lmer(growth~damage*light + (1|shadehouse), data=plants)
+plot(mod.pl.lmer1, resid(.)~fitted(.)) ## not great; larger fitted values have larger residuals
+hist(plants$growth)
+plants$growth2  <- sqrt(plants$growth - #
+                          min(plants$growth))
+mod.pl.lmer2 <- lmer(growth2~damage*light + (1|shadehouse), data=plants)
+mod.pl.lmer3 <- lmer(growth2~damage+light + (1|shadehouse), data=plants)
+anova(mod.pl.lmer2, mod.pl.lmer3)
+mod.pl.lmer4 <- lmer(growth2~damage + (1|shadehouse), data=plants)
+anova(mod.pl.lmer3, mod.pl.lmer4)
+summary(mod.pl.lmer3)
+anova(mod.pl.lmer2)
+getME(mod.pl.lmer2, 'devcomp')$dims
+pf(q= 50.14, df1=1, df2=dendf.nc1, lower.tail=FALSE)
+pf(q= 55.64, df1=1, df2=dendf.nc2, lower.tail=FALSE)
+pf(q= 1.95, df1=1, df2=dendf.nc1, lower.tail=FALSE)
+pf(q= 50.14, df1=1, df2=dendf.c1, lower.tail=FALSE)
+pf(q= 55.64, df1=1, df2=dendf.c2, lower.tail=FALSE)
+pf(q= 1.95, df1=1, df2=dendf.c1, lower.tail=FALSE)
+Anova(mod.pl.lmer2, test='F')
+mod.pl.lmer4 <- lmer(growth2~damage*light + #
+                       (1+damage|shadehouse), data=plants)
+confint.result <- confint(mod.pl.lmer4, method='boot', nsim = 499)
+confint.result
+summary(mod.pl.lmer4)
+confint.result
+ggplot(plants, aes(x=damage, y=growth, colour=light, group=light)) +#
+  geom_smooth(method='lm') + geom_point() +facet_wrap(~shadehouse)
+q()
+rm(list=ls())#
+options(digits=3, width=60)#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)#
+library(MuMIn)#
+#
+?pvalues
+radon <- read.csv("exampledata/Radon_Data_RB.csv")
+head(radon)
+mod.radon.lmer1 <- lmer(radon~floor + (1|county), data=radon)
+summary(mod.radon.lmer1)
+anova(mod.radon.lmer1) ## no denominator dfs or p values
+mod0 <- update(mod.radon.lmer1, ~.-floor)
+summary(mod0)
+mod1 <- mod.radon.lmer1
+anova(mod0, mod1)
+summary(mod.radon.lmer1) ## 2369 observations
+getME(mod.radon.lmer1, 'devcomp')$dims
+den.df <- 2369 - 2 - 1   # n - p - 1 random variance
+den.df
+anova(mod.radon.lmer1)   #F=112
+pf(q=112, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant
+den.df <- 2369  -2 - 68  # n - p - q random levels
+den.df
+pf(q=112, 1, den.df, lower.tail=FALSE)
+pf(112, 1, den.df, lower.tail=FALSE)
+pf(112, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant
+anova(mod.radon.lmer1)   #F=112
+library(pbkrtest)
+KRmodcomp(mod0, mod1)
+anova(mod0, mod1)  #likelihood ratio test result
+a<-KRmodcomp(mod0,mod1)
+getKR(a,'ddf')
+Anova(mod.radon.lmer1, test='F')
+summary(mod.radon.lmer1)
+confint.result <- confint(mod.radon.lmer1, method='boot', nsim = 499) ## has a number of options
+?confint
+plants <- read.csv('exercises/plantdamage.csv')
+mod.pl.lmer1 <- lmer(growth~damage*light + (1|shadehouse), data=plants)
+summary(plants)
+hist(plants$growth)
+plants$growth2  <- sqrt(plants$growth - #
+                          min(plants$growth))
+hist(plants$growth)
+plants$growth2  <- sqrt(plants$growth - #
+                          min(plants$growth))
+summary(plants)
+hist(plants$growth2)
+mod.pl.lmer2 <- lmer(growth2~damage*light + (1|shadehouse), data=plants)
+plot(mod.pl.lmer2, sqrt(abs(resid(.)))~fitted(.)) ## better
+plot(mod.pl.lmer2, resid(.)~fitted(.)|light) ## better
+resids<-resid(mod.pl.lmer2,type='pearson')
+qqPlot(resids)
+ranefs <- ranef(mod.pl.lmer2)$shadehouse
+qqPlot(ranefs$'(Intercept)') ## not great
+mod.pl.lmer2 <- lmer(growth2~damage*light + (1|shadehouse), data=plants)
+mod.pl.lmer3 <- lmer(growth2~damage+light + (1|shadehouse), data=plants)
+anova(mod.pl.lmer2, mod.pl.lmer3)
+mod.pl.lmer4 <- lmer(growth2~damage + (1|shadehouse), data=plants)
+anova(mod.pl.lmer3, mod.pl.lmer4)
+anova(mod.pl.lmer2)
+getME(mod.pl.lmer2, 'devcomp')$dims
+dendf.nc1 = 103-4-1  #nested in greenhouse (D, D*L)
+dendf.nc2 = 10-2-1  # not nested in greenhouse (L)
+pf(q= 50.14, df1=1, df2=dendf.nc1, lower.tail=FALSE)
+dendf.nc2 = 10-2-1  # not nested in greenhouse (L)
+pf(q= 55.64, df1=1, df2=dendf.nc2, lower.tail=FALSE)
+pf(q= 1.95, df1=1, df2=dendf.nc1, lower.tail=FALSE)
+head(plant,n=20)
+head(plants,n=20)
+dendf.c1 = 103-4-10#
+dendf.c2 = 10-2#
+#damage#
+pf(q= 50.14, df1=1, df2=dendf.c1, lower.tail=FALSE)#
+#light#
+pf(q= 55.64, df1=1, df2=dendf.c2, lower.tail=FALSE)#
+#damage:light#
+pf(q= 1.95, df1=1, df2=dendf.c1, lower.tail=FALSE)
+Anova(mod.pl.lmer2, test='F')
+summary(mod.radon.lmer1)
+confint.result <- confint(mod.radon.lmer1, method='boot', nsim = 499) ## has a number of options
+confint.result
+confint.result <- confint(mod.radon.lmer1, method='boot', nsim = 999) ## has a number of options
+confint.result
+q()
+mod.x2.1 <- glmer(bush~age+female + (1|state),#
+                  family=binomial(link='logit'),#
+                  data=polls)
+q()
+rm(list=ls())#
+options(digits=3, width=60)#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)#
+library(MuMIn)
+biodepth <- read.csv("exampledata/Biodepth.csv")
+summary(biodepth)
+mod.bd.lmer1 <- lmer(sqrt(biomass)~log.diversity + (1|location), data=biodepth)
+summary(mod.bd.lmer1)
+anova(mod.bd.lmer1) ## no denominator dfs or p values
+mod0 <- update(mod.radon.lmer1, ~.-log.diversity)
+mod1 <- lmer(sqrt(biomass)~log.diversity + (1|location), data=biodepth)
+summary(mod1)
+anova(mod1) ## no denominator dfs or p values
+mod0 <- update(mod1, ~.-log.diversity)
+anova(mod0, mod1)
+summary(mod1) ## 2369 observations
+summary(mod1) ## 476 observations
+getME(mod1, 'devcomp')$dims
+den.df <- 476 - 2 - 1   # n - p - 1 random variance
+den.df  #2366
+anova(mod1)   #F=112
+pf(47.5, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant
+den.df <- 476  -2 - 8  # n - p - q random levels
+den.df <- 476  -2 - 8  # n - p - q random levels
+den.df  #2299
+pf(47.5, 1, den.df, lower.tail=FALSE)
+library(pbkrtest)
+KRmodcomp(mod0, mod1)
+473+(473-466)/2
+466+(473-466)/2
+getME(mod1, 'devcomp')$dims
+466+(473-466)/2
+464+(471-464)/2
+den.df <- 476 - 2 - 1 - 2   # n - p - 1 random variance
+den.df  #473
+pf(47.5, df1=1, df2=den.df, lower.tail=FALSE) ## highly significant
+den.df <- 476  -2 - 8 - 2  # n - p - q random levels - 2 REML
+den.df  #466
+pf(47.5, 1, den.df, lower.tail=FALSE)
+464+(471-464)/2
+464+(471-464)/2
+Anova(mod.radon.lmer1, test='F')
+Anova(mod1, test='F')
+KRmodcomp(mod0, mod1)
+summary(mod1)
+confint.result <- confint(mod1, method='boot', nsim = 999) ## has a number of options
+confint.result
+mods <- replicate(499, {#
+  newresp <- simulate(mod1)#
+  newmod <- refit(mod1, newresp)}, #
+  simplify=FALSE)
+fixef.sims <- sapply(mods, fixef) #
+fixef.sims#
+## will give you the fixed effect for all models#
+class(fixef.sims)#
+#
+## to get confidence intervals, used ordered quantiles#
+apply(fixef.sims, 1, quantile, c(0.025, 0.975))
+confint.result
+q()

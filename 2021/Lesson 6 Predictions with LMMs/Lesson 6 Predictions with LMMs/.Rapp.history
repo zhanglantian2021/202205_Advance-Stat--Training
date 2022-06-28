@@ -1,0 +1,326 @@
+preddat.bd#
+## remake the model matrix, just in case we lost it!#
+form.bd <-   formula(mod.bd.lmer1, fixed.only=TRUE)#
+form.bd <- update(form.bd, NULL~.)#
+predmat.bd <- model.matrix(form.bd, data=preddat.bd)#
+predmat.bd#
+## get the variance covariance matrix#
+vcv.bd <- vcov(mod.bd.lmer1)
+se.swiss <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)))
+se.loc <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)))#
+se.loc
+vc.bd <- as.data.frame(VarCorr(mod.bd.lmer1))#
+vc.bd#
+vc.bd <- vc.bd[vc.bd$grp=='location', 'vcov']
+se.new <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)) + vc.bd)
+se.new ## much bigger
+qt(p=0.025, df = dim(biodepth)[1])
+preddat.bd$pred.new.ucl <- preddat.bd$pred.new + se.new*1.96#
+preddat.bd$pred.new.lcl <- preddat.bd$pred.new -se.new*1.96
+preddat.bd$pred.swiss.ucl <- preddat.bd$pred.swiss + se.swiss*1.96#
+preddat.bd$pred.swiss.lcl <- preddat.bd$pred.swiss - se.swiss*1.96#
+preddat.bd
+p<-ggplot(data=preddat.bd, aes(x=log.diversity, y=pred.new, ymin=pred.new.lcl, ymax=pred.new.ucl)) +geom_smooth(stat='identity') +theme_classic()
+p + expand_limits(y=c(-200,800))
+preddat.bd$pred.loc.ucl <- preddat.bd$pred.swiss + se.swiss*1.96
+preddat.bd$pred.loc.lcl <- preddat.bd$pred.swiss - se.swiss*1.96
+preddat.bd$pred.loc.ucl <- preddat.bd$pred.swiss + se.loc*1.96
+preddat.bd$pred.loc.lcl <- preddat.bd$pred.swiss - se.loc*1.96
+se.new <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)) + vc.bd)
+preddat.bd$pred.new.ucl <- preddat.bd$pred.new + se.new*1.96
+preddat.bd$pred.new.lcl <- preddat.bd$pred.new -se.new*1.96
+preddat.bd$pred.loc.ucl <- preddat.bd$pred.loc + se.loc*1.96
+preddat.bd$pred.loc.lcl <- preddat.bd$pred.loc - se.loc*1.96
+biodepth <- read.csv('exercises/Biodepth.csv')#
+#
+summary(biodepth)#
+mod.bd.lmer1 <- lmer(biomass~log.diversity + (1|location),data=biodepth)#
+summary(mod.bd.lmer1)#
+#
+unique(biodepth$location)#
+biodepth$log.diversity#
+## inbuilt predictions#
+preddat.bd <- expand.grid(log.diversity=c(1,2,4,8,16), location=unique(biodepth$location))#
+preddat.bd
+preddat.bd$pred.new <- predict(mod.bd.lmer1, newdata=preddat.bd,re.form=~0)#
+preddat.bd#
+#
+## for Switzerland#
+preddat.bd$pred.swiss <- predict(mod.bd.lmer1,newdata=preddat.bd,re.form=~(1|location))#
+preddat.bd ## looks good.
+## now do this manually ("by hand").#
+form.bd <- formula(mod.bd.lmer1, fixed.only=TRUE)#
+form.bd#
+## remove LHS#
+form.bd <- update(form.bd, NULL~.)#
+form.bd#
+predmat.bd <- model.matrix(form.bd,data=preddat.bd)#
+head(predmat.bd)
+preddat.bd$pred.new.man <- as.vector(predmat.bd %*%fixef(mod.bd.lmer1))
+preddat.bd
+ranefmat <- model.matrix(~0+location, data=preddat.bd)
+preddat.bd$pred.loc.man <- predmat.bd %*% fixef(mod.bd.lmer1) +ranefmat %*% as.matrix(ranef(mod.bd.lmer1)$location)
+preddat.bd
+summary(mod.bd.lmer1)
+preddat.bd
+form.bd <-   formula(mod.bd.lmer1, fixed.only=TRUE)
+form.bd <- update(form.bd, NULL~.)
+predmat.bd <- model.matrix(form.bd, data=preddat.bd)
+predmat.bd
+vcv.bd <- vcov(mod.bd.lmer1)
+se.loc <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)))
+se.loc
+vc.bd <- as.data.frame(VarCorr(mod.bd.lmer1))
+vc.bd
+vc.bd <- vc.bd[vc.bd$grp=='location', 'vcov']
+se.new <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)) + vc.bd)
+qt(p=0.025, df = dim(biodepth)[1])
+preddat.bd$pred.new.ucl <- preddat.bd$pred.new + se.new*1.96
+preddat.bd$pred.new.lcl <- preddat.bd$pred.new -se.new*1.96
+preddat.bd$pred.loc.ucl <- preddat.bd$pred.loc + se.loc*1.96
+preddat.bd$pred.loc.lcl <- preddat.bd$pred.loc - se.loc*1.96
+preddat.bd$pred.loc.lcl <- preddat.bd$pred.loc
+se.loc*1.96
+preddat.bd$pred.loc
+preddat.bd$pred.loc <- predict(mod.bd.lmer1,newdata=preddat.bd,re.form=~(1|location))
+preddat.bd ## looks good.
+preddat.bd$pred.loc.ucl <- preddat.bd$pred.loc + se.loc*1.96
+preddat.bd$pred.loc.lcl <- preddat.bd$pred.loc - se.loc*1.96
+p<-ggplot(data=preddat.bd, aes(x=log.diversity, y=pred.new, ymin=pred.new.lcl, ymax=pred.new.ucl)) +geom_smooth(stat='identity') +theme_classic()#
+p + expand_limits(y=c(-200,800))
+quartz() ##opens a new graphics window#
+q<-ggplot(data=preddat.bd, aes(x=log.diversity, y=pred.swiss, ymin=pred.loc.lcl, ymax=pred.loc.ucl)) +geom_smooth(stat='identity') +theme_classic()#
+q + expand_limits(y=c(-200,800))
+q<-ggplot(data=preddat.bd, aes(x=log.diversity, y=pred.swiss, ymin=pred.loc.lcl, ymax=pred.loc.ucl)) +geom_smooth(stat='identity') +facet_wrap(~location) +theme_classic()
+q + expand_limits(y=c(-200,800))
+summary(biodepth)
+preddat.bd <- expand.grid(log.diversity=0:5, location=unique(biodepth$location))
+preddat.bd
+summary(biodepth)
+biodepth$sqrtbiomass <- sqrt(biodepth$biomass)
+summary(biodepth)
+mod.bd.lmer1 <- lmer(sqrtbiomass~log.diversity + (1|location),data=biodepth)
+summary(mod.bd.lmer1)
+summary(biodepth)
+unique(biodepth$location)
+preddat.bd <- expand.grid(log.diversity=0:5, location=unique(biodepth$location))
+preddat.bd
+preddat.bd$pred.new <- predict(mod.bd.lmer1, newdata=preddat.bd,re.form=~0)
+preddat.bd
+preddat.bd$pred.loc <- predict(mod.bd.lmer1,newdata=preddat.bd,re.form=~(1|location))
+preddat.bd ## looks good.
+form.bd <- formula(mod.bd.lmer1, fixed.only=TRUE)
+form.bd
+form.bd <- update(form.bd, NULL~.)
+form.bd
+predmat.bd <- model.matrix(form.bd,data=preddat.bd)
+predmat.bd
+fixef(mod.bd.lmer1)
+preddat.bd$pred.new.man <- as.vector(predmat.bd %*%fixef(mod.bd.lmer1))
+preddat.bd
+form.bd <- formula(mod.bd.lmer1, fixed.only=TRUE)
+form.bd
+form.bd <- update(form.bd, NULL~.)
+form.bd
+form.bd <- formula(mod.bd.lmer1, fixed.only=TRUE)
+form.bd
+form.bd <- update(form.bd, NULL~.)
+form.bd
+predmat.bd <- model.matrix(form.bd,data=preddat.bd)
+predmat.bd1 <- model.matrix(~log.diversity,data=preddat.bd)
+predmat.bd
+predmat.bd1
+head(predmat.bd)
+preddat.bd$pred.new.man <- as.vector(predmat.bd %*%fixef(mod.bd.lmer1))
+preddat.bd
+ranefmat <- model.matrix(~0+location, data=preddat.bd)
+ranefmat
+preddat.bd$pred.loc.man <- predmat.bd %*% fixef(mod.bd.lmer1) +ranefmat %*% as.matrix(ranef(mod.bd.lmer1)$location)
+preddat.bd
+vcv.bd <- vcov(mod.bd.lmer1)
+vcv.bd
+se.loc <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)))
+se.loc
+vc.bd <- as.data.frame(VarCorr(mod.bd.lmer1))
+vc.bd
+vc.bd <- vc.bd[vc.bd$grp=='location', 'vcov']
+vc.bd
+se.new <- sqrt(diag(predmat.bd %*% vcv.bd %*% t(predmat.bd)) + vc.bd)
+se.new ## much bigger
+qt(p=0.025, df = dim(biodepth)[1])
+preddat.bd$pred.new.ucl <- preddat.bd$pred.new + se.new*1.96
+preddat.bd$pred.new.lcl <- preddat.bd$pred.new -se.new*1.96
+preddat.bd$pred.loc.ucl <- preddat.bd$pred.loc + se.loc*1.96
+preddat.bd$pred.loc.lcl <- preddat.bd$pred.loc - se.loc*1.96
+preddat.bd
+head(preddat.bd)
+preddat.bd$pred.new.sq <- (preddat.bd$pred.new)^2
+preddat.bd$pred.loc.sq <- (preddat.bd$pred.loc)^2
+preddat.bd$pred.new.sq <- (preddat.bd$pred.new)^2#
+preddat.bd$pred.loc.sq <- (preddat.bd$pred.loc)^2#
+#
+preddat.bd$pred.new.ucl.sq <- (preddat.bd$pred.new.ucl)^2#
+preddat.bd$pred.new.lcl.sq <- (preddat.bd$pred.new.lcl)^2#
+preddat.bd$pred.loc.ucl.sq <- (preddat.bd$pred.loc.ucl)^2#
+preddat.bd$pred.loc.lcl.sq <- (preddat.bd$pred.loc.lcl)^2
+p<-ggplot(data=preddat.bd, aes(x=log.diversity, y=pred.new.sq, ymin=pred.new.lcl.sq, ymax=pred.new.ucl.sq)) +geom_smooth(stat='identity') +theme_classic()
+p
+preddat.swiss <- subset(preddat,location=="Switzerland")
+preddat.swiss <- subset(preddat.bd,location=="Switzerland")
+preddat.swiss
+p<-ggplot(data=preddat.swiss, aes(x=log.diversity, y=pred.new.sq, ymin=pred.new.lcl.sq, ymax=pred.new.ucl.sq)) +geom_smooth(stat='identity') +theme_classic()
+p
+quartz() ##opens a new graphics window#
+q<-ggplot(data=preddat.swiss, aes(x=log.diversity, y=pred.loc.sq, ymin=pred.loc.lcl.sq, ymax=pred.loc.ucl.sq)) +geom_smooth(stat='identity') +theme_classic()
+q
+p + expand_limits(y=c(0,1000))
+quartz() ##opens a new graphics window
+p + expand_limits(y=c(0,1000))
+quartz() ##opens a new graphics window
+q + expand_limits(y=c(0,1000))
+q()
+library(ade4)
+##############################
+##Prediction with LMMs#
+##############################
+#
+## CODE from Robert Bagchi (University of Connecticut)#
+rm(list=ls())#
+options(digits=3, width=60)#
+## load the relevant libraries#
+library(lme4)#
+library(ggplot2)#
+library(lattice)#
+library(arm)#
+library(utils)#
+library(car)
+irr <- read.csv("exampledata/irrigation.csv")#
+#
+summary(irr)
+mod.irr <- lm(growth ~ soil*water, data=irr)
+par(mfrow=c(2,2)); plot(mod.irr)  #ok#
+summary(mod.irr) #everything significant
+par(mfrow=c(2,2)); plot(mod.irr)  #ok#
+summary(mod.irr) #everything significant#
+#now let us get out the predicted values (fitted values) for the data points that we used in the dataset#
+fit1 <- fitted(mod.irr)#
+head(fit1)#
+irr$fitted <- fitted(mod.irr)#
+head(irr)#
+#
+plot(growth~fitted,irr)
+par(mfrow=c(1,1))#
+plot(fit1, irr$growth)#
+abline(a=0,b=1, col=2) ## 1:1 line
+newdat <- data.frame(soil=factor('sand'), water=2)
+newdat
+predict(mod.irr, newdata=newdat) ## gives the expected growth rate
+predict(mod.irr, newdata=newdat, se.fit=TRUE)
+predict(mod.irr, newdata=newdat, interval='confidence', level=0.95)
+predict(mod.irr, newdata=newdat, interval='prediction', level=0.95)
+summary(mod.irr) #everything significant
+?predict
+qt(p=0.025, df = 96)
+newdat$se.fit
+newdat$se.fit[1]
+fir-se.fit*t
+fit <- 0.388#
+se.fit <- 0.049#
+t <- qt(p=0.025, df = 96)  # t value for given DF#
+fit-se.fit*t
+fit-se.fit*abs(t)
+n <- dim(irr)[1]
+n
+RSS <- c(crossprod(mod.irr$residuals))
+summary(mod.irr)
+MSE <- RSS / length(mod.irr $residuals)
+MSE
+RMSE <- sqrt(MSE)
+RMSE
+sig2 <- RSS / res$df.residual
+sig2 <- RSS / mod.irr$df.residual
+sig2
+sig <- sqrt(sig2)
+sig
+fit-abs(t)*sig*sqrt(1+(1/n))
+predict(mod.irr, newdata=newdat, interval='prediction', level=0.95)
+fit-abs(t)*MSE*sqrt(1+(1/n))
+fit-abs(t)*RMSE*sqrt(1+(1/n))
+fit-abs(t)*sig
+RMSE
+sig
+fit-abs(t)*sig*sqrt(1+1/n))
+fit-abs(t)*sig*sqrt(1+1/n)
+mean(irr$water)
+fit-abs(t)*sig*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2))
+)
+fit-abs(t)*RMSE*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2)))
+fit-abs(t)*sig*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2)))
+predict(mod.irr, newdata=newdat, interval='prediction', level=0.95)
+predict(mod.irr, newdata=newdat, se.fit=TRUE)
+summary(mod.irr)
+fit-abs(t)*sig*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2)))
+t.quantiles <- qt(c(.025, .975), 96)
+fit+t.quantiles*sig*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2)))
+predict(mod.irr, newdata=newdat, interval='prediction', level=0.95)
+summary(mod.irr)
+irr <- read.csv("exampledata/irrigation.csv")
+summary(irr)
+X <- c(1,1,2,2)
+X0 <- c(1,1,2,2)
+irr
+mod.irr <- lm(growth ~ water, data=irr)
+summary(mod.irr) #everything significant
+fit1 <- fitted(mod.irr)
+irr$fitted <- fitted(mod.irr)
+plot(growth~fitted,irr)
+par(mfrow=c(1,1))#
+plot(fit1, irr$growth)#
+abline(a=0,b=1, col=2) ## 1:1 line
+newdat <- data.frame(water=2)
+newdat
+predict(mod.irr, newdata=newdat) ## gives the expected growth rate
+predict(mod.irr, newdata=newdat, se.fit=TRUE)
+predict(mod.irr, newdata=newdat, interval='confidence', level=0.95)
+predict(mod.irr, newdata=newdat, interval='prediction', level=0.95)
+fit <- 0.568
+se.fit <- 0.0565
+t <- qt(p=0.025, df = 98)  # t value for given DF
+fit-abs(t)*se.fit
+t.quantiles <- qt(c(.025, .975), 98)  # t value for given DF
+fit+t.quantiles*se.fit
+n <- dim(irr)[1]
+fit+t.quantiles*sig*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2)))
+RSS <- c(crossprod(mod.irr$residuals))
+MSE <- RSS / length(mod.irr $residuals)
+RMSE <- sqrt(MSE)
+sig2 <- RSS / mod.irr$df.residual
+sig <- sqrt(sig2)
+sig
+fit+t.quantiles*sig*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2)))
+predict(mod.irr, newdata=newdat, interval='prediction', level=0.95)
+X0 <- c(1,2)
+X <- cbind(irr$water)
+intercept <- c(rep(1,each=(dim(irr)[df])))
+intercept <- c(rep(1,each=(dim(irr)[1])))
+X <- cbind(intercept,irr$water)
+X
+X <- as.matrix(cbind(intercept,irr$water))
+X
+prod <- t(X0)%*%(t(X)%*%X)%*%X0
+prod
+prod <- t(X0)%*%(solve(t(X)%*%X))%*%X0
+prod
+fit+t.quantiles*sig*sqrt(1+1/n + prod)
+predict(mod.irr, newdata=newdat, interval='prediction', level=0.95)
+fit+t.quantiles*sig*sqrt(1+1/n +((2-mean(irr$water))^2/sum((irr$water - mean(irr$water))^2)))
+fit+t.quantiles*RMSE*sqrt(1+1/n + prod)
+fit+t.quantiles*sig*sqrt(1+1/n + prod)
+fit+t.quantiles*sig*sqrt(1 + prod)
+t.quantiles <- qt(c(.025, .975), 98)  # t value for given DF
+fit+t.quantiles*sig*sqrt(1 + prod)
+fit+t.quantiles*sig*sqrt(1 + as.scalar(prod))
+str(prod)
+fit+t.quantiles*sig*sqrt(1 + scalar(prod))
+fit+t.quantiles*sig*sqrt(1 + prod[1,1])
+q()

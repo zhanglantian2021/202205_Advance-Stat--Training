@@ -1,0 +1,629 @@
+plot(tree1)
+treeU <- chronopl(tree1, lambda=0.1)
+par(mfrow=c(1,2), mai=c(.8,.1,.1,.1))#
+plot(tree1)#
+plot(treeU)
+combine<-comparative.data(treeU,meandata,Species,vcv=TRUE,na.omit=F)
+combine
+phy.min <- combine$phy
+phy.min
+plot(phy.min)
+meandata2 <- combine$data
+summary(meandata2)
+dim(meandata2)
+mod0 <- pgls(RMF  ~ 1, combine, lambda='ML')
+summary(mod0)
+mod1 <- pgls(RMF  ~ log(Mass20) + Continent + Climate, combine, lambda='ML')
+summary(mod1)
+z.lam <- phylolm(meandata2$RMF ~ 1, phy=phy.min, model = "lambda")#
+summary(z.lam)  #same result as above#
+#
+z.OU <- phylolm(meandata2$RMF ~ 1, phy=phy.min, model = "OUfixedRoot")#
+summary(z.OU)
+x<-meandata2$RMF#
+phy <- phy.min#
+nperm <- 500#
+perm <- data.frame(lam=rep(0,nperm), alpha=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ 1, phy=phy, model = "lambda")#
+	z.OU.perm <- phylolm(x.perm ~ 1, phy=phy, model = "OUfixedRoot")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$alpha[i] <- z.OU.perm$optpar#
+}#
+#
+P.lam <- mean(perm$lam > z.lam$optpar)#
+P.OU <- mean(perm$alpha < z.OU$optpar)#
+#
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="")#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+z.lam.1 <- phylolm(RMF ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda")
+summary(z.lam.1)  #same result as above; RMF is borderline significant
+z.lam.1.boot <- phylolm(RMF ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda",boot=500)
+confint(z.lam.1.boot)
+x<-meandata2$RMF#
+phy <- phy.min#
+nperm <- 500#
+# we will record permuted coefficients for all predictors and for lambda#
+perm <- data.frame(lam=rep(0,nperm), Intercept=0,lnMass20=0,ContinentAUS=0,ContinentSAM=0,ClimateSA=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy, model = "lambda")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$Intercept[i] <- coef(z.lam.perm)[1]#
+	perm$lnMass20[i] <- coef(z.lam.perm)[2]#
+	perm$ContinentAUS[i] <- coef(z.lam.perm)[3]#
+	perm$ContinentSAM[i] <- coef(z.lam.perm)[4]#
+	perm$ClimateSA[i] <- coef(z.lam.perm)[5]#
+}
+P.ClimateSA <- mean(perm$ClimateSA < coef(z.lam.1)[5])
+hist(perm$ClimateSA, main=paste("P =", round(P.ClimateSA, digits=3)), xlab="")#
+lines(coef(z.lam.1)[5]* c(1,1),c(0,nperm),  col="red")
+z.lam <- phylolm(meandata2$RER ~ 1, phy=phy.min, model = "lambda")
+meandata2
+z.lam <- phylolm(meandata2$RER ~ 1, phy=phy.min, model = "lambda")
+z.lam <- phylolm(meandata2$RMF ~ 1, phy=phy.min, model = "lambda")
+summary(meandata2)
+dim(meandata2)
+phy.min
+z.lam <- phylolm(meandata2$RMF ~ 1, phy=phy.min, model = "lambda")
+plot(phy.min)
+dim(meandata2)
+meandata2
+z.lam <- phylolm(meandata2$RMF ~ 1, phy=phy.min, model = "lambda")
+summary(z.lam)  #same result as above
+z.lam <- phylolm(meandata2$RER ~ 1, phy=phy.min, model = "lambda")
+summary(z.lam)  #same result as above
+z.OU <- phylolm(meandata2$RER ~ 1, phy=phy.min, model = "OUfixedRoot")
+summary(z.OU)
+mod0 <- pgls(RER  ~ 1, combine, lambda='ML')
+summary(mod0)
+x<-meandata2$RER#
+phy <- phy.min#
+nperm <- 500#
+perm <- data.frame(lam=rep(0,nperm), alpha=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ 1, phy=phy, model = "lambda")#
+	z.OU.perm <- phylolm(x.perm ~ 1, phy=phy, model = "OUfixedRoot")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$alpha[i] <- z.OU.perm$optpar#
+}#
+#
+P.lam <- mean(perm$lam > z.lam$optpar)#
+P.OU <- mean(perm$alpha < z.OU$optpar)#
+#
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="")#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+z.lam.1 <- phylolm(RER ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda")
+summary(z.lam.1)  #same result as above; RMF is borderline significant
+z.lam.1.boot <- phylolm(RER ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda",boot=500)
+confint(z.lam.1.boot)
+x<-meandata2$RER#
+phy <- phy.min#
+nperm <- 500#
+# we will record permuted coefficients for all predictors and for lambda#
+perm <- data.frame(lam=rep(0,nperm), Intercept=0,lnMass20=0,ContinentAUS=0,ContinentSAM=0,ClimateSA=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy, model = "lambda")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$Intercept[i] <- coef(z.lam.perm)[1]#
+	perm$lnMass20[i] <- coef(z.lam.perm)[2]#
+	perm$ContinentAUS[i] <- coef(z.lam.perm)[3]#
+	perm$ContinentSAM[i] <- coef(z.lam.perm)[4]#
+	perm$ClimateSA[i] <- coef(z.lam.perm)[5]#
+}
+P.ClimateSA <- mean(perm$ClimateSA < coef(z.lam.1)[5])
+hist(perm$ClimateSA, main=paste("P =", round(P.ClimateSA, digits=3)), xlab="")#
+lines(coef(z.lam.1)[5]* c(1,1),c(0,nperm),  col="red")
+P.ClimateSA <- mean(perm$ClimateSA < coef(z.lam.1)[5])
+P.ClimateSA
+perm$ClimateSA < coef(z.lam.1)[5]
+mean(perm$ClimateSA < coef(z.lam.1)[5])
+hist(perm$ClimateSA, main=paste("P =", round(P.ClimateSA, digits=3)), xlab="")#
+lines(coef(z.lam.1)[5]* c(1,1),c(0,nperm),  col="red")
+plot(z.lam.1)
+resid(z.lam.1)
+plot(resid(z.lam.1)~fitted(z.lam.1)
+)
+z.lam.1 <- gls(RER ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda")
+z.lam.1 <- gls(RER ~ log(Mass20) + Continent + Climate, data = meandata2, correlation=corPagel(phy.min), model = "lambda")
+z.lam.1 <- gls(RER ~ log(Mass20) + Continent + Climate, data = meandata2, correlation=corPagel(phy.min))
+z.lam.1 <- gls(RER ~ log(Mass20) + Continent + Climate, correlation=corPagel(1.0, phy=phy.min), data = meandata2,method="ML")
+summary(z.lam.1)  #same result as above; RMF is borderline significant
+plot(z.lam.1)
+#AKI's phylogeny data#
+#
+rm(list=ls())#
+options(digits=3, width=60)#
+#
+library(ape)#
+library(phylolm)#
+library(lme4)#
+library(nlme)#
+library(phytools)#
+#library(phyr)#
+#library(picante)#
+library(caper)
+akidata <- read.csv("exercises/Div sim traits.csv", header=TRUE, na.strings="*")
+tree1 <- read.nexus("exercises/tree.phylogeny.newick",tree.names = NULL)
+akitree <- read.tree("exercises/qizad.tre",tree.names = NULL)
+akitree <- read.tree("exercises/qizad.tre")
+library(ape)
+akitree <- read.tree("exercises/qjzad.tre")
+plot(akitree)
+akitree
+dim(meandata)
+summary(akidata)
+dim(akidata)
+akidata <- read.csv("exercises/Div sim traits.csv", header=TRUE, na.strings="*")#
+summary(akidata)#
+dim(akidata)
+plot(akitree)
+summary(akidata)
+combine<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+akidata <- read.csv("exercises/Div sim traits.csv", header=TRUE, na.strings="*")
+summary(akidata)
+akidata <- read.csv("exercises/Div sim traits.csv", header=TRUE, na.strings="*")
+summary(akidata)
+combine<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+plot(akitree)
+head(akidata)
+head(meandata)
+meandata <- read.csv("exampledata/Savanna_seedlings.csv", header=TRUE, na.strings="*")
+head(meandata)
+head(akidata)
+akitree
+tree1
+tree1 <- read.nexus("exampledata/Savanna_seedling_nexus",tree.names = NULL)
+tree1
+nodelabels(akitree)
+akitree
+plot(akitree)
+nodelabels(akitree)
+tree1 <- read.nexus("exampledata/Savanna_seedling_nexus",tree.names = NULL)
+plot(tree1)
+nodelabels(tree1)
+tree1 <- read.nexus("exampledata/Savanna_seedling_nexus",tree.names = NULL)
+?drop.nodelabels
+??drop.nodelabels
+combine<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+duplicated(akitree$tip.label)
+duplicated(c(phy$tip.label, phy$node.label))
+duplicated(c(akitree$tip.label, phy$node.label))
+duplicated(c(akitree$tip.label, akitree$node.label))
+akitree$node.label <- NULL
+duplicated(c(akitree$tip.label, akitree$node.label))
+combine<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+combine
+combine2<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+combine2
+mod0 <- pgls(RootTissueDens  ~ 1, combine, lambda='ML')
+summary(mod0)
+dim(akidata)
+summary(akidata)
+mod0 <- pgls(LeafArea  ~ 1, combine, lambda='ML')
+summary(mod0)
+mod0 <- pgls(LeafThickness  ~ 1, combine, lambda='ML')
+summary(mod0)
+summary(akidata)
+mod0 <- pgls(LeafTissueDens  ~ 1, combine, lambda='ML')
+summary(mod0)
+hist(akidata$RootTissueDens)
+hist(sqrt(akidata$RootTissueDens))
+hist(sqrt(akidata$LeafArea))
+hist((akidata$LeafArea))
+hist(log(akidata$LeafArea))
+mod0 <- pgls(log(akidata$LeafArea)  ~ 1, combine, lambda='ML')
+summary(mod0)
+mod0 <- pgls(sqrt(RootTissueDens)  ~ log(akidata$LeafArea), combine, lambda='ML')
+summary(mod0)
+lm1 <- lm(sqrt(RootTissueDens)  ~ log(akidata$LeafArea),akidata)
+summary(lm1)
+summary(akidata)
+par(mfrow=c(2,3))#
+hist(sqrt(akidata$SLA))#
+hist(sqrt(akidata$RootTissueDens))#
+hist(log(akidata$LeafArea))#
+hist(sqrt(akidata$LeafThickness))#
+hist(sqrt(akidata$LeafTissueDens))#
+hist(sqrt(akidata$RootDiam))
+akidata <- read.csv("exercises/Div sim traits.csv", header=TRUE, na.strings="*")
+dim(akidata)
+combine2<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+par(mfrow=c(2,3))#
+hist(sqrt(akidata$SLA))#
+hist(sqrt(akidata$RootTissueDens))#
+hist(log(akidata$LeafArea))#
+hist(sqrt(akidata$LeafThickness))#
+hist(sqrt(akidata$LeafTissueDens))#
+hist(sqrt(akidata$RootDiam))
+par(mfrow=c(2,3))#
+hist(log(akidata$SLA))#
+hist(sqrt(akidata$RootTissueDens))#
+hist(log(akidata$LeafArea))#
+hist(sqrt(akidata$LeafThickness))#
+hist(sqrt(akidata$LeafTissueDens))#
+hist(sqrt(akidata$RootDiam))
+P.ClimateSA <- mean(perm$ClimateSA < coef(z.lam.1)[5])
+x<-meandata2$RER
+meandata <- read.csv("exampledata/Savanna_seedlings.csv", header=TRUE, na.strings="*")
+tree1 <- read.nexus("exampledata/Savanna_seedling_nexus",tree.names = NULL)
+treeU <- chronopl(tree1, lambda=0.1)
+combine<-comparative.data(treeU,meandata,Species,vcv=TRUE,na.omit=F)
+combine
+phy.min <- combine$phy#
+phy.min#
+plot(phy.min)#
+#
+meandata2 <- combine$data#
+summary(meandata2)#
+dim(meandata2)
+mod0 <- pgls(RER  ~ 1, combine, lambda='ML')
+z.lam <- phylolm(meandata2$RER ~ 1, phy=phy.min, model = "lambda")
+summary(z.lam)  #same result as above
+z.OU <- phylolm(meandata2$RER ~ 1, phy=phy.min, model = "OUfixedRoot")
+summary(z.OU)
+x<-meandata2$RER#
+phy <- phy.min#
+nperm <- 500#
+perm <- data.frame(lam=rep(0,nperm), alpha=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ 1, phy=phy, model = "lambda")#
+	z.OU.perm <- phylolm(x.perm ~ 1, phy=phy, model = "OUfixedRoot")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$alpha[i] <- z.OU.perm$optpar#
+}#
+#
+P.lam <- mean(perm$lam > z.lam$optpar)#
+P.OU <- mean(perm$alpha < z.OU$optpar)#
+#
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="")#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+# Now add in the full fixed effects model to test (bX)#
+z.lam.1 <- phylolm(RER ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda")#
+summary(z.lam.1)  #same result as above; RMF is borderline significant#
+plot(resid(z.lam.1)~fitted(z.lam.1))
+#parametric bootstrap#
+z.lam.1.boot <- phylolm(RER ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda",boot=500)#
+#
+confint(z.lam.1.boot)#
+#so RMF lower in SA species
+x<-meandata2$RER#
+phy <- phy.min#
+nperm <- 500#
+# we will record permuted coefficients for all predictors and for lambda#
+perm <- data.frame(lam=rep(0,nperm), Intercept=0,lnMass20=0,ContinentAUS=0,ContinentSAM=0,ClimateSA=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy, model = "lambda")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$Intercept[i] <- coef(z.lam.perm)[1]#
+	perm$lnMass20[i] <- coef(z.lam.perm)[2]#
+	perm$ContinentAUS[i] <- coef(z.lam.perm)[3]#
+	perm$ContinentSAM[i] <- coef(z.lam.perm)[4]#
+	perm$ClimateSA[i] <- coef(z.lam.perm)[5]#
+}
+P.ClimateSA <- mean(perm$ClimateSA > coef(z.lam.1)[5])
+P.ClimateSA
+hist(perm$ClimateSA, main=paste("P =", round(P.ClimateSA, digits=3)), xlab="")#
+lines(coef(z.lam.1)[5]* c(1,1),c(0,nperm),  col="red")
+summary(mod0)
+summary(z.OU)
+summary(z.lam)  #same result as above
+z.OU <- phylolm(meandata2$RER ~ 1, phy=phy.min, model = "OUfixedRoot")
+summary(z.OU)
+P.lam <- mean(perm$lam > z.lam$optpar)
+P.OU <- mean(perm$alpha < z.OU$optpar)
+P.lam
+P.OU
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="")#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="")
+x<-meandata2$RER#
+phy <- phy.min#
+nperm <- 500#
+perm <- data.frame(lam=rep(0,nperm), alpha=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ 1, phy=phy, model = "lambda")#
+	z.OU.perm <- phylolm(x.perm ~ 1, phy=phy, model = "OUfixedRoot")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$alpha[i] <- z.OU.perm$optpar#
+}#
+#
+P.lam <- mean(perm$lam > z.lam$optpar)#
+P.OU <- mean(perm$alpha < z.OU$optpar)
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="")#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="",xlim=(0,50))#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="",xlim=c(0,50))#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="",xlim=c(40,50))#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+par(mfrow=c(2,1), mai=c(1,1,.4,.4))#
+hist(perm$lam, main=paste("P =", round(P.lam, digits=3)), xlab="")#
+lines(z.lam$optpar * c(1,1), c(0,nperm), col="red")#
+hist(perm$alpha, main=paste("P =", round(P.OU, digits=3)), xlab="")#
+lines(z.OU$optpar * c(1,1), c(0,nperm), col="red")
+z.lam.1 <- phylolm(RER ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda")
+summary(z.lam.1)  #same result as above; RMF is borderline significant
+z.lam.1.boot <- phylolm(RER ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy.min, model = "lambda",boot=500)
+confint(z.lam.1.boot)
+x<-meandata2$RER#
+phy <- phy.min#
+nperm <- 500#
+# we will record permuted coefficients for all predictors and for lambda#
+perm <- data.frame(lam=rep(0,nperm), Intercept=0,lnMass20=0,ContinentAUS=0,ContinentSAM=0,ClimateSA=0)#
+for(i in 1:nperm){#
+	x.perm <- x[sample(1:length(x))]#
+	names(x.perm) <- names(x)#
+	z.lam.perm <- phylolm(x.perm ~ log(Mass20) + Continent + Climate, data = meandata2, phy=phy, model = "lambda")#
+	perm$lam[i] <- z.lam.perm$optpar#
+	perm$Intercept[i] <- coef(z.lam.perm)[1]#
+	perm$lnMass20[i] <- coef(z.lam.perm)[2]#
+	perm$ContinentAUS[i] <- coef(z.lam.perm)[3]#
+	perm$ContinentSAM[i] <- coef(z.lam.perm)[4]#
+	perm$ClimateSA[i] <- coef(z.lam.perm)[5]#
+}
+perm$ClimateSA > coef(z.lam.1)[5]
+P.ClimateSA <- mean(perm$ClimateSA > coef(z.lam.1)[5])
+P.ClimateSA
+hist(perm$ClimateSA, main=paste("P =", round(P.ClimateSA, digits=3)), xlab="")#
+lines(coef(z.lam.1)[5]* c(1,1),c(0,nperm),  col="red")
+par(mfrow=c(2,3))#
+hist(log(akidata$SLA))#
+hist(sqrt(akidata$RootTissueDens))#
+hist(log(akidata$LeafArea))#
+hist(sqrt(akidata$LeafThickness))#
+hist(sqrt(akidata$LeafTissueDens))#
+hist(sqrt(akidata$RootDiam))
+par(mfrow=c(2,3))#
+hist(log(akidata$SLA))#
+hist(sqrt(akidata$RootTissueDens))#
+hist(log(akidata$LeafArea))#
+hist((akidata$LeafThickness))#
+hist(sqrt(akidata$LeafTissueDens))#
+hist(sqrt(akidata$RootDiam))
+par(mfrow=c(2,3))#
+hist(log(akidata$SLA))#
+hist(sqrt(akidata$RootTissueDens))#
+hist(log(akidata$LeafArea))#
+hist(log(akidata$LeafThickness))#
+hist(sqrt(akidata$LeafTissueDens))#
+hist(sqrt(akidata$RootDiam))
+df2 <-akidata[c("SLA","RootTissueDens","LeafArea","LeafThickness","LeafTissueDens","RootDiam")]
+akidata$SLA.log <- (log(akidata$SLA))#
+akidata$RootTissueDens.sqrt <- (sqrt(akidata$RootTissueDens))#
+akidata$LeafArea.log <- (log(akidata$LeafArea))#
+akidata$LeafThickness.log <- (log(akidata$LeafThickness))#
+akidata$LeafTissueDens.sqrt <- (sqrt(akidata$LeafTissueDens))#
+akidata$RootDiam.sqrt <- (sqrt(akidata$RootDiam))
+df2 <-akidata[c("SLA.log","RootTissueDens.sqrt","LeafArea.log","LeafThickness.log","LeafTissueDens.sqrt","RootDiam")]
+TraitCorr <- cor(df2, use="pairwise.complete.obs", method="pearson")
+TraitCorr
+combine2<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+mod0 <- pgls(LeafThickness.log  ~ 1, combine, lambda='ML')
+akidata$SLA.log <- (log(akidata$SLA))#
+akidata$RootTissueDens.sqrt <- (sqrt(akidata$RootTissueDens))#
+akidata$LeafArea.log <- (log(akidata$LeafArea))#
+akidata$LeafThickness.log <- (log(akidata$LeafThickness))#
+akidata$LeafTissueDens.sqrt <- (sqrt(akidata$LeafTissueDens))#
+akidata$RootDiam.sqrt <- (sqrt(akidata$RootDiam))
+combine2<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)
+mod0 <- pgls(LeafThickness.log  ~ 1, combine, lambda='ML')
+mod0 <- pgls(LeafThickness.log  ~ 1, combine2, lambda='ML')
+summary(mod0)
+TraitCorr
+mod0 <- pgls(LeafTissueDens.sqrt  ~ 1, combine2, lambda='ML')
+summary(mod0)
+TraitCorr
+mod0 <- pgls(RootTissueDens.sqrt  ~ 1, combine2, lambda='ML')
+summary(mod0)
+mod1 <- pgls(RootTissueDens.sqrt ~ SLA.log, combine, lambda='ML')
+mod1 <- pgls(RootTissueDens.sqrt ~ SLA.log, combine2, lambda='ML')
+summary(mod1)
+q()
+#AKI's phylogeny data#
+#
+rm(list=ls())#
+options(digits=3, width=60)#
+#
+library(ape)#
+library(phylolm)#
+library(lme4)#
+library(nlme)#
+library(phytools)#
+#library(phyr)#
+#library(picante)#
+library(caper)
+akidata <- read.csv("exercises/Div sim traits.csv", header=TRUE, na.strings="*")#
+summary(akidata)#
+dim(akidata)#
+head(akidata)#
+#
+akitree <- read.tree("exercises/qjzad.tre")#
+plot(akitree)#
+akitree#
+duplicated(akitree$tip.label)#
+duplicated(c(akitree$tip.label, akitree$node.label))#
+akitree$node.label <- NULL
+par(mfrow=c(2,3))#
+hist(log(akidata$SLA))#
+hist(sqrt(akidata$RootTissueDens))#
+hist(log(akidata$LeafArea))#
+hist(log(akidata$LeafThickness))#
+hist(sqrt(akidata$LeafTissueDens))#
+hist(sqrt(akidata$RootDiam))
+akidata$SLA.log <- (log(akidata$SLA))#
+akidata$RootTissueDens.sqrt <- (sqrt(akidata$RootTissueDens))#
+akidata$LeafArea.log <- (log(akidata$LeafArea))#
+akidata$LeafThickness.log <- (log(akidata$LeafThickness))#
+akidata$LeafTissueDens.sqrt <- (sqrt(akidata$LeafTissueDens))#
+akidata$RootDiam.sqrt <- (sqrt(akidata$RootDiam))
+#check correlations (fishing fishing fishing...)#
+df2 <-akidata[c("SLA.log","RootTissueDens.sqrt","LeafArea.log","LeafThickness.log","LeafTissueDens.sqrt","RootDiam")]#
+#
+TraitCorr <- cor(df2, use="pairwise.complete.obs", method="pearson") #
+TraitCorr#
+#
+combine2<-comparative.data(akitree,akidata,Species,vcv=TRUE,na.omit=F)#
+combine2#
+#
+mod0 <- pgls(RootTissueDens.sqrt  ~ 1, combine2, lambda='ML')#
+summary(mod0)
+mod1 <- pgls(RootTissueDens.sqrt ~ SLA.log, combine2, lambda='ML')#
+summary(mod1)
+?MoranI
+??ape
+chooseCRANmirror()
+install.packages("V.PhyloMaker")
+.libPaths
+.libPaths(ape)
+.libPaths()
+library(V.PhyloMaker)
+install.packages(“githubinstall”)
+install.packages((“githubinstall”))
+install.packages("githubinstall")
+library(githubinstall)
+install.packages("devtools")
+library(devtools)
+install_github("jinyizju/V.PhyloMaker")
+githubinstall("jinyizju/V.PhyloMaker")
+githubinstall("V.PhyloMaker")
+install_github("jinyizju/V.PhyloMaker")
+library(devtools)
+q()
+rm(list=ls())#
+options(digits=3, width=60)#
+###########################################
+## Anthony Ives & Kyle Tomlinson#
+## 21/3/2019#
+###########################################
+#
+## Prac 10: Phylogenetic regression#
+#
+#you will need a bunch of R packages to do this prac#
+#
+library(ape)#
+library(phylolm)#
+library(lme4)#
+library(nlme)#
+library(phytools)#
+#library(phyr)#
+#library(picante)#
+library(caper)
+n <- 15#
+phy <- compute.brlen(rtree(n=n), method = "Grafen", power = 1)#
+#
+par(mfrow=c(1,1))#
+plot(phy)#
+#
+# This function simulates some trait data for the species in the phylogeny evolving according to a given model of evolution (in this case Brownian motion - random drift model) (we will discuss brownian motion further later on)#
+x <- rTraitCont(phy, model = "BM", sigma = 1)#
+par(mfrow=c(1,2))#
+contMap(phy, x=x)#
+par(mai=c(.8,.1,.1,.1))#
+plot(x,1:length(x))#
+#
+# it is clear that trait values can evolve differently across the tree purely by chance#
+# it is clear that closely related species end up with similar trait values because of their shared evolutionary history#
+#####################################################
+##  Code 10.2 - Turning a phylogeny into a covariance matrix#
+#####################################################
+#
+#recall what our phylogeny, 'phy', looks like:#
+#
+par(mfrow=c(1,2))#
+plot(phy)#
+#
+# construct the covariance matrix of shared path lengths#
+TreeCovar <- vcv.phylo(phy) #
+TreeCovar
+# Phylogenetic signal and branch-length transformations#
+# Pagel's branch-length transformation#
+#
+# lets modify the branch lengths in 'phy' to impose a different evolutionary history#
+# we start using Pagel's lambda, which adjusts branch lengths#
+## Pagel's lambda is bound in [0,1] where lambda ->1 implies strong phylo signal and lambda -> 0 means no phylogenetic signal#
+# we will make 3 trees#
+#
+phy.lam.1.0 <- transf.branch.lengths(phy=phy, model="lambda", parameters=list(lambda = 1.0))$tree#
+#
+phy.lam.0.5 <- transf.branch.lengths(phy=phy, model="lambda", parameters=list(lambda = 0.5))$tree#
+#
+phy.lam.0.0 <- transf.branch.lengths(phy=phy, model="lambda", parameters=list(lambda = 0.0))$tree#
+#
+# plot them#
+par(mfrow=c(1,4))#
+plot(phy); plot(phy.lam.1.0); plot(phy.lam.0.5); plot(phy.lam.0.0)#
+#
+# Pagel's lambda shifts the phylogenetic signal from the full phylogenetic tree structure (lambda=1) towards deeper and deeper separation and finally no covariance at all (lamda = 0) as indicated by zero shared path length. This last phylogeny we call the star phylogeny. It indicates no phylogenetic signal#
+#
+# Now look at the covariance matrices constructed from these trees#
+# notice what happens to the off-diagonal elements#
+#
+TreeCovar <- vcv.phylo(phy)#
+TreeCovar.1.0 <- vcv.phylo(phy.lam.1.0)#
+TreeCovar.0.5 <- vcv.phylo(phy.lam.0.5)#
+TreeCovar.0.0 <- vcv.phylo(phy.lam.0.0)#
+#
+TreeCovar#
+TreeCovar.1.0#
+TreeCovar.0.5#
+TreeCovar.0.0   # this is an Identity matrix
+#recall what our phylogeny, 'phy', looks like, and also the associated trait we made in the first part:#
+#
+# just a reminder of what this looks like#
+quartz()#
+par(mfrow=c(1,2))#
+contMap(phy, x=x)#
+par(mai=c(.8,.1,.1,.1))#
+plot(x,1:length(x))#
+#
+#now make a dataframe of the trait data (this is not actually necessary..)#
+d <- data.frame(x)#
+#
+#  now model x using ordinary lm and gls without a covariance structure#
+#
+lm1 <- lm(x~1,data=d)#
+summary(lm1)#
+#
+gls1 <- gls(x~1, d)#
+summary(gls1) # identical
+q()
+q()

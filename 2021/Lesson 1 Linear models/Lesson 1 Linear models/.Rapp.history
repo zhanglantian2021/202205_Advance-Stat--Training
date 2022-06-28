@@ -1,0 +1,263 @@
+summary(fishspeed2)
+levels(fishspeed2$Species) <- c("Galaxias", "TT", "TT")
+summary(lm1)
+summary(fishspeed2)
+lm1 <- lm(Speed~Temperature*Species,fishspeed2)
+summary(lm1)
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")
+summary(fishspeed2)
+levels(fishspeed2$Species) <- c("Galaxias", "TT", "TT")
+lm1 <- lm(Speed~Temperature*Species,fishspeed2)
+summary(lm1)
+q()
+fishspeed <-read.table(file="fishspeed.csv",header=T,row.names=NULL,sep=",")
+summary(fishspeed)
+dim(fishspeed)
+summary(lm(Speed~Temperature,data= fishspeed))
+summary(lm(Speed~Species,data= fishspeed))
+t.test(Speed~Species,data= fishspeed,var.equal = TRUE)
+dim(fishspeed)[1]
+b0 <- c(rep(1,dim(fishspeed)[1]))
+b0
+b1 <- fishspeed$Temperature
+X <- data.frame(b0,b1)
+X
+X <- as.matrix(X)
+X
+y <- fishspeed$Speed
+y
+Xt <- t(X)
+dim(X);dim(Xt)
+XX <- Xt %*% X
+dim(XX)
+XXinv <- solve(XX)
+XX
+XXinv
+Xy <- Xt%*%y
+B <- XXinv %*% Xy
+B
+summary(lm(Speed~Temperature,data= fishspeed))
+fishspeed$Species
+b1 <- c(rep(0,10),rep(1,8))
+b1
+X <- data.frame(b0,b1)
+X
+y <- fishspeed$Speed
+Xt <- t(X)
+XX <- Xt %*% X
+X <- as.matrix(X)
+Xt <- t(X)
+XX <- Xt %*% X
+XXinv <- solve(XX)
+Xy <- Xt%*%y
+B <- XXinv %*% Xy
+B
+summary(lm(Speed~Species,data= fishspeed))
+t.test(Speed~Species,data= fishspeed,var.equal = TRUE)
+B
+yt <- t(y)
+yy <- yt %*% y
+Bt <- t(B)
+BXy <- Bt %*% Xy
+n= dim(fishspeed)[1]
+p=2
+res.var <- (yy - BXy)*(1/(n-p))
+res.var
+summary(lm(Speed~Temperature,data= fishspeed))
+plot(fishspeed $Temperature, fishspeed $Speed,col= c("red", "blue")[as.numeric(fishspeed $Species)])
+lm1 <- lm(Speed~Temperature*Species,fishspeed)
+summary(lm1)
+anova(lm1)
+plot(fishspeed $Temperature,lm1$fitted,ylab="Fish speed",xlab="Temperature")
+points(fishspeed $Temperature,fishspeed $Speed,pch=3,col="blue")
+res.var
+sqrt(res.var)
+summary(lm(Speed~Temperature,data= fishspeed))
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")
+levels(fishspeed2$Species2) <- c("Galaxias", "TT", "TT")
+levels(fishspeed2$Species) <- c("Galaxias", "TT", "TT")
+fishspeed2
+lm1 <- lm(Speed~Temperature*Species,fishspeed2)
+summary(lm1)
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")#
+summary(fishspeed2)#
+lm1 <- lm(Speed~Temperature*Species,fishspeed2)#
+summary(lm1)
+fishspeed2$Species <- relevel(fishspeed2$Species,ref="Trout")
+lm1 <- lm(Speed~Temperature*Species,fishspeed2)
+summary(lm1)
+levels(fishspeed2$Species) <- c("Galaxias", "TT", "TT")
+fishspeed2
+lm1 <- lm(Speed~Temperature*Species,fishspeed2)
+summary(lm1)
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")
+levels(fishspeed2$Species) <- c("Galaxias", "TT", "TT")
+lm1 <- lm(Speed~Temperature*Species,fishspeed2)
+summary(lm1)
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")
+b2 <- as.numeric(fishspeed2 $Species == "Galaxias", data=fishspeed2)
+b2
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")
+# we need a column of 1's for the intercept of same length as the number of rows in the fishspeed data#
+b0 <- c(rep(1,dim(fishspeed2)[1])) #
+b1 <- fishspeed2 $Temperature #
+# we need dummy variates for the categorical cases that arent the intercept#
+b2 <- as.numeric(fishspeed2 $Species == "Galaxias", data=fishspeed2) #
+b3 <- as.numeric(fishspeed2 $Species == "Tenebrias", data=fishspeed2) #
+b4 <- b1*b2 #
+b5 <- b1*b3
+X <- data.frame(b0,b1,b2,b3,b4,b5)
+X <- as.matrix(X)
+X
+y <- fishspeed2$Speed
+Xt <- t(X)
+XX <- Xt %*% X
+XXinv <- solve(XX)
+Xy <- Xt%*%y
+B <- XXinv %*% Xy
+B
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")
+lm3 <- lm(Speed~Temperature*Species,fishspeed2)
+summary(lm3)
+par(mfrow=c(2,2))#
+plot(lm3)
+q()
+b0 <- c(rep(1,dim(fishspeed)[1]))
+fishspeed <-read.table(file="fishspeed.csv",header=T,row.names=NULL,sep=",")
+summary(fishspeed)
+b0 <- c(rep(1,dim(fishspeed)[1]))
+summary(lm(Speed~Temperature,data= fishspeed))
+summary(lm(Speed~Species,data= fishspeed))
+X <- data.frame(b0,b1)
+b0 <- c(rep(1,dim(fishspeed)[1]))
+b1 <- fishspeed$Temperature
+X <- data.frame(b0,b1)
+X <- as.matrix(X)
+X
+y <- fishspeed$Speed
+Xt <- t(X)
+dim(X);dim(Xt)
+XX <- Xt %*% X
+dim(XX)
+XXinv <- solve(XX)
+Xy <- Xt%*%y
+XXinv
+Xy <- Xt%*%y
+B <- XXinv %*% Xy
+B
+summary(lm(Speed~Temperature,data= fishspeed))
+yt <- t(y)
+yy <- yt %*% y
+Bt <- t(B)
+BXy <- Bt %*% Xy
+n= dim(fishspeed)[1]
+p=2
+res.var <- (yy - BXy)*(1/(n-p))
+res.var
+summary(lm(Speed~Temperature,data= fishspeed))
+sqrt(res.var)
+?qqplot
+resids <- resid(lm3, type='pearson')
+fishspeed2 <-read.table(file="fishspeed2.csv",header=T,row.names=NULL,sep=",")
+lm3 <- lm(Speed~Temperature*Species,fishspeed2)
+par(mfrow=c(2,2))#
+plot(lm3)
+resids <- resid(lm3, type='pearson')
+par(mfrow=c(1,1))#
+qqPlot(resids)
+?qqPlot
+??qqPlot
+library(car)
+qqPlot(resids)
+shapiro.test(residuals(lm3))
+plot(lm3, abs(resid(.))~fitted(.,type='pearson'), type=c('p', 'r'), abline=0) ## obvious trend
+plot(lm3, abs(resid(.))~fitted(.,type='pearson'),  abline=0) ## obvious trend
+plot(lm3, abs(resid(.))~fitted(.,type='pearson'), type=c('p'), abline=0) ## obvious trend
+plot(lm3, abs(resids(.))~fitted(.,type='pearson'), type=c('p', 'r'), abline=0)
+plot(lm3, abs(resids(lm3))~fitted(lm3,type='pearson'), type=c('p', 'r'), abline=0)
+plot(lm3, abs(resids)~fitted(lm3,type='pearson'), type=c('p', 'r'), abline=0)
+bptest(residuals(lm3)~trait.ave$Strategy, studentize = TRUE)
+?leveneTest
+bptest(residuals(lm3)~fishspeed2$Species, studentize = TRUE)
+leveneTest(residuals(gls1)~trait.ave$Species)
+leveneTest(residuals(lm3)~trait.ave$Species)
+leveneTest(residuals(lm3)~ fishspeed2 $Species)
+leveneTest(residuals(lm3)~ fishspeed2$Species)
+leveneTest(residuals(lm3), fishspeed2$Species)
+leveneTest(residuals(lm3), as.factor(fishspeed2$Species))
+plot(lm3, abs(resids)~lm3$fitted, abline=0)
+plot(resids~lm3$fitted, abline=0)
+?abline
+plot(resids~lm3$fitted); abline(a = 0, b = 0, col = 2)
+plot(sqrt(abs(resids))~lm3$fitted); abline(a = 0, b = 0, col = 2)
+plot(sqrt(abs(resids))~lm3$fitted); abline(a = 1, b = 0, col = 2)
+plot(sqrt(abs(resids))~lm3$fitted); abline(a = 2, b = 0, col = 2)
+leveneTest(residuals(lm3), as.factor(fishspeed2$Species))
+plot(sqrt(abs(resids))~lm3$fitted); abline(a = 1.96, b = 0, col = 2)
+bptest(residuals(lm3), as.factor(fishspeed2$Species), studentize = TRUE)
+?leveneTest
+q()
+getwd()
+fishspeed <-read.table(file="fishspeed.csv",header=T,row.names=NULL,sep=",")
+summary(fishspeed)
+fishspeed$Species <- as.factor(fishspeed$Species)
+summary(fishspeed)
+dim(fishspeed)
+summary(lm(Speed~Temperature,data= fishspeed))
+summary(lm(Speed~Species,data= fishspeed))
+t.test(Speed~Species,data= fishspeed,var.equal = TRUE)
+dim(fishspeed)[1]
+dim(fishspeed)
+b0 <- c(rep(1,dim(fishspeed)[1]))
+b0
+b1 <- fishspeed$Temperature
+b1
+X <- data.frame(b0,b1)
+X <- as.matrix(X)
+X
+y <- fishspeed$Speed
+y
+Xt <- t(X)
+X
+Xt
+XX <- Xt %*% X
+dim(XX)
+XXinv <- solve(XX)
+XXinv
+Xy <- Xt%*%y
+Xy
+B <- XXinv %*% Xy
+B
+summary(lm(Speed~Temperature,data= fishspeed))
+b0 <- c(rep(1,dim(fishspeed)[1]))
+b0 <- c(rep(1,dim(fishspeed)[1]))
+fishspeed$Species
+b1 <- c(rep(0,10),rep(1,8))
+b1
+fishspeed
+X <- data.frame(b0,b1)
+X <- as.matrix(X)
+X
+y <- fishspeed$Speed
+Xt <- t(X)
+XX <- Xt %*% X
+XXinv <- solve(XX)
+Xy <- Xt%*%y
+B <- XXinv %*% Xy
+B
+summary(lm(Speed~Species,data= fishspeed))
+yt <- t(y)
+yy <- yt %*% y
+Bt <- t(B)
+Bt
+yy
+BXy <- Bt %*% Xy
+BXy
+n= dim(fishspeed)[1]
+p=2
+n
+res.var <- (yy - BXy)*(1/(n-p))
+res.var
+sqrt(res.var)   # residual standard error
+summary(lm(Speed~Temperature,data= fishspeed))
+summary(lm(Speed~Species,data= fishspeed))

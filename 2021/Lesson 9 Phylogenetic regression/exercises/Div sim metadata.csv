@@ -1,0 +1,21 @@
+plot,habitat,site,slope,aspect,slope.position,rel.moisture
+RF1,Rainforest,Onefour,0,270,3,1
+RF2,Rainforest,Onefour,20,130,1.5,2
+RF3,Rainforest,Onefour,5,90,1,2
+RF4,Rainforest,Onefour,5,40,2,1
+RF5,Rainforest,Onefour,5,130,2,1
+RF6,Rainforest,Kinsella,1,90,3,1
+RF7,Rainforest,Kinsella,8,0,2,2
+RF8,Rainforest,Kinsella,5,100,3,2
+RF9,Rainforest,Kinsella,5,160,1.5,3
+RF10,Rainforest,Kinsella,18,155,2.5,2
+SF1,Secondary For,Onefour,12,180,2,1
+SF2,Secondary For,Onefour,5,164,3,3
+SF3,Secondary For,Onefour,15,220,2.5,3
+SF4,Secondary For,Onefour,3,160,3,3
+SF5,Secondary For,Onefour,5,160,3,3
+SF6,Secondary For,Kinsella,6,150,1.5,3
+SF7,Secondary For,Kinsella,4,140,2.5,2
+SF8,Secondary For,Kinsella,2.5,45,3,1
+SF9,Secondary For,Kinsella,7.5,90,2,1
+SF10,Secondary For,Kinsella,20,0,1.5,1

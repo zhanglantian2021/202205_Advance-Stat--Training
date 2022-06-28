@@ -1,0 +1,294 @@
+MM1 <- lmer(Yhist~Drug*DogType*Time + (1|DogID),df1)
+summary(MM1)
+library(ggplot2)
+seal <- read.csv('sealData1.csv', h=T)
+summary(seal)
+head(seal)
+plot(n.response/n.obs~pupage,data=seal)
+mod.seal <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial(link=logit))
+summary(mod.seal)
+anova(mod.seal1,test='Chisq')
+mod.seal1 <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial)
+anova(mod.seal1,test='Chisq')
+mod.seal1 <- glm(cbind(n.response, n.obs-n.response)~1, data=seal,family=binomial)
+mod.seal0 <- glm(cbind(n.response, n.obs-n.response)~1, data=seal,family=binomial)
+mod.seal1 <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial)
+summary(mod.seal0)
+summary(mod.seal1)
+anova(mod.seal1,test='Chisq')
+mod.seal <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial(link=logit))
+summary(seal)
+newdata <- data.frame(pupage=1:30)
+newdata
+summary(mod.seal)
+preds <- predict(mod.seal, newdata=newdata,type= 'link', se.fit=T)
+preds
+newdata$fit_T <- preds$fit
+newdata$upr_T <- preds$fit+preds$se.fit*1.96
+newdata$lwr_T <- preds$fit-preds$se.fit*1.96
+newdata
+plot(newdata$pupage,newdata$fit_T,type="l")
+lines(newdata$pupage,newdata$upr_T,lty=2)
+lines(newdata$pupage,newdata$lwr_T,lty=2)
+newdata$upr <- plogis(preds$fit+preds$se.fit*1.96)
+newdata$lwr <- plogis(preds$fit-preds$se.fit*1.96)
+newdata$fit <- plogis(preds$fit)
+head(newdata) #note the extra columns in the dataframe
+ggplot(data=seal, aes(x=pupage, y=n.response/n.obs)) + geom_point()
++ geom_smooth(data=newdata,aes(x=pupage, y=fit, ymin=lwr, ymax=upr),stat='identity')
+ggplot(data=seal, aes(x=pupage, y=n.response/n.obs)) + geom_point() + geom_smooth(data=newdata,aes(x=pupage, y=fit, ymin=lwr, ymax=upr),stat='identity')
+aphid2 <- read.csv('AphidData2.csv', h=T)
+summary(aphid2) #two treatments and counts of aphids. typical poisson data
+head(aphid2)
+mod1 <- glm(n.aphids~trt, data=aphid2, family=poisson)
+summary(mod1)
+par(mfrow=c(2,2)); plot(mod1)
+anova(mod1, test='Chisq') #Resid.Dev much greater than Resid.Df!!!
+chisq
+chisq <- sum(resid(mod1, type='pearson')^2)
+chisq
+chisq/df.residual(mod1) ## much greater than 1
+mod2 <- glm(n.aphids~trt, data=aphid2, family=quasipoisson(link=log))
+coef(mod2)
+coef(mod1)
+par(mfrow=c(2,2)); plot(mod1) #
+quartz()  #windows people, please use "windows()" here#
+par(mfrow=c(2,2)); plot(mod2)
+summary(mod2)
+summary(mod1)
+chisq/df.residual(mod1) ## much greater than 1
+sum(resid(mod1, type='pearson')^2)/df.residual(mod1)
+sum(resid(mod2, type='pearson')^2)/df.residual(mod2) ## the same
+summary(mod1)$dispersion
+summary(mod2)$dispersion ## different between models
+summary(mod2)
+anova(mod2, test='F')
+mydata <- read.csv("binary.csv",header=T,sep=" ")
+head(mydata)
+summary(mydata)
+mydata$rank <- as.factor(mydata$rank)
+summary(mydata)
+mylogit <- glm(admit ~ gre*gpa*rank, data = mydata, family = "binomial")
+summary(mylogit)
+par(mfrow=c(2,2)); plot(mylogit)
+chisq <- sum(resid(mylogit, type='pearson')^2)
+chisq
+chisq/df.residual(mylogit) ## close to 1; no overdispersion problem
+library(arm)
+x <- predict(mylogit)
+y <- resid(mylogit)
+binnedplot(x,y)
+null.logit <- glm(admit ~ 1, data = mydata, family = "binomial")
+summary(null.logit)
+anova(null.logit,mylogit,test="Chisq")
+anova(mylogit,test="Chisq")
+glm1 <- glm(admit ~ gre*gpa*rank, data = mydata, family = "binomial")
+summary(glm1)
+anova(glm1,test="Chisq")
+glm2 <- glm(admit ~ gre*gpa+gre*rank+gpa*rank, data = mydata, family = "binomial")
+summary(glm2)
+anova(glm1,glm2,test="Chisq")
+summary(glm1)
+anova(glm1,test="Chisq")
+anova(glm1,glm2,test="Chisq")
+summary(glm2)
+anova(glm2,test="Chisq")
+glm3 <- glm(admit ~ gre*gpa+gpa*rank, data = mydata, family = "binomial")
+summary(glm3)
+anova(glm2,glm3,test="Chisq")
+anova(glm3,test="Chisq")
+glm4 <- glm(admit ~ gre*gpa+rank, data = mydata, family = "binomial")
+summary(glm4)
+anova(glm3,glm4,test="Chisq")
+anova(glm4,test="Chisq")
+glm5 <- glm(admit ~ gre+gpa+rank, data = mydata, family = "binomial")
+summary(glm5)
+anova(glm4,glm5,test="Chisq")
+q()
+library(ggplot2)
+seal <- read.csv('sealData1.csv', h=T)
+plot(n.response/n.obs~pupage,data=seal)
+mod.seal <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial(link=logit))
+summary(mod.seal)
+mod.seal1 <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial)
+summary(mod.seal1)
+mod.seal0 <- glm(cbind(n.response, n.obs-n.response)~1, data=seal,family=binomial)
+summary(mod.seal0)
+mod.seal <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial(link=logit))#
+summary(mod.seal)  #
+#now we will make a output figures using the derived linear generalised linear model#
+#
+summary(seal)#
+#
+## build new data frame to house predictions#
+##it should cover the same range as the values you have recorded in oberevations#
+newdata <- data.frame(pupage=1:30)#
+newdata#
+summary(mod.seal)#
+## make the predictions - notice the type='link' argument#
+preds <- predict(mod.seal, newdata=newdata,type= 'link', se.fit=T)#
+#
+preds #the command produces a fitted value with standard error for each predictor value in newdata#
+summary(seal)#
+dim(seal)#
+## add CI predictions to new data frame in the transformed range #
+# as n = 50 for original data, using z=1.96 to get the 95% CIs is reasonable#
+#
+newdata$fit_T <- preds$fit#
+newdata$upr_T <- preds$fit+preds$se.fit*1.96#
+newdata$lwr_T <- preds$fit-preds$se.fit*1.96#
+#
+## plot with prediction in the transformed range#
+plot(newdata$pupage,newdata$fit_T,type="l")#
+lines(newdata$pupage,newdata$upr_T,lty=2)#
+lines(newdata$pupage,newdata$lwr_T,lty=2)
+?plogis#
+head(newdata)#
+newdata$upr <- plogis(preds$fit+preds$se.fit*1.96) #
+newdata$lwr <- plogis(preds$fit-preds$se.fit*1.96)#
+newdata$fit <- plogis(preds$fit)#
+#
+head(newdata) #note the extra columns in the dataframe#
+str(newdata)
+ggplot(data=seal, aes(x=pupage, y=n.response/n.obs)) + geom_point() + geom_smooth(data=newdata,aes(x=pupage, y=fit, ymin=lwr, ymax=upr),stat='identity')
+mod.seal1 <- glm(cbind(n.response, n.obs-n.response)~pupage, data=seal,family=binomial)#
+summary(mod.seal1)
+mod.seal0 <- glm(cbind(n.response, n.obs-n.response)~1, data=seal,family=binomial)
+summary(mod.seal0)
+anova(mod.seal1,test='Chisq')
+l_saturated<-c()
+l_regression<-c()
+l_intercept<-c()
+likelihood(mod.seal0)
+logLik(mod.seal0)
+logLik(mod.seal1)
+seal $x1 <- as.factor(1:nrow(seal))
+summary(seal)
+mod.sealS <- glm(cbind(n.response, n.obs-n.response)~x1, data=seal,family=binomial)
+summary(mod.sealS)
+logLik(mod.sealS)
+-2(logLik(mod.sealS)-logLik(mod.seal1))
+logLik(mod.sealS)
+logLik(mod.seal1)
+-2*(logLik(mod.sealS)-logLik(mod.seal1))
+-2*(logLik(mod.sealS)-logLik(mod.seal0))
+summary(mod.seal1)
+anova(mod.seal1,test='Chisq')
+-2*(logLik(mod.sealS)-logLik(mod.seal1))
+2*(logLik(mod.sealS)-logLik(mod.seal1))
+mydata <- read.csv("ceb.csv",header=T)
+ggplot(mydata, aes(mean, fill = educ)) + geom_histogram(binwidth = 0.5, position = "dodge")
+summary(mydata)
+summary(m1 <- glm(mean ~ dur+res+educ, family = "gamma", data = mydata))
+summary(m1 <- glm(mean ~ dur+res+educ, family = "poisson", data = mydata))
+m2 <- glm(mean ~ dur+res+educ,data=mydata,family=Gamma(link=log))
+summary(m1g)
+m1g <- glm(mean ~ dur+res+educ,data=mydata,family=Gamma(link=log))
+summary(m1g)
+anova(m1,m1g)
+anova(m1,m1g,test='Chisq')
+AIC(m1,m1g)
+summary(m1 <- glm(mean ~ dur+res+educ, family = "poisson", data = mydata))
+summary(m1 <- glm(mean ~ dur+res+educ, family = poisson, data = mydata))
+AIC(m1,m1g)
+AIC(m1)
+m1g <- glm(mean ~ dur+res+educ,data=mydata,family=Gamma(link=log))
+summary(m1g)
+m1 <- glm(mean ~ dur+res+educ, family = poisson, data = mydata)
+AIC(m1)
+summary(m1)
+summary(m1g)
+logLik(m1)
+summary(m1)
+summary(m1g)
+logLik(m1)
+mydata $x1 <- as.factor(1:nrow(mydata))
+summary(mydata)
+mydata$dur <- as.factor(mydata$dur)
+mydata$dur <- as.factor(mydata$dur)#
+mydata$res <- as.factor(mydata$res)#
+mydata$educ <- as.factor(mydata$educ)
+summary(mydata)
+m1 <- glm(mean ~ dur+res+educ, family = poisson, data = mydata)
+summary(m1)
+logLik(m1)
+m1 <- glm(mean ~ dur, family = poisson, data = mydata)
+logLik(m1)
+m1s <- glm(mean ~ x1, family = poisson, data = mydata)
+summary(m1s)
+m1s <- glm(mean ~ x1, family = Gamma, data = mydata)
+m1s <- glm(mean ~ x1, family = Gamma(link=log), data = mydata)
+summary(m1s)
+m1p <- glm(mean ~ dur+res+educ, family = poisson, data = mydata)
+m1g <- glm(mean ~ dur+res+educ,data=mydata,family=Gamma(link=log))
+mydata$dur1 <- as.integer(mydata$dur)
+mydata$res1 <- as.integer(mydata$res)
+mydata$educ1 <- as.integer(mydata$educ)
+m1p <- glm(mean ~ dur1+res1+educ1, family = poisson, data = mydata)
+summary(m1p)
+summary(mydata)
+m1p <- glm(mean ~ dur1+res1+educ1, family = poisson, data = mydata)
+summary(m1p)
+mydata$mean1 <- as.integer(mydata$mean)
+m1p <- glm(mean1 ~ dur+res+educ, family = poisson, data = mydata)
+summary(m1p)
+logLik(m1p)
+m1g <- glm(mean ~ dur+res+educ,data=mydata,family=Gamma(link=log))
+summary(m1g)
+AIC(m1p,m1g)
+m1g.s <- glm(mean ~ x1, family = Gamma(link=log), data = mydata)
+summary(m1g.s)
+logLik(m1g.s)
+m1p.s <- glm(mean ~ x1, family = poisson, data = mydata)
+m1p.s <- glm(mean1 ~ x1, family = poisson, data = mydata)
+summary(m1p.s)
+logLik(m1p.s)
+m1p.s <- glm(mean ~ dur+res+educ,data=mydata,family=Poisson(link=log))
+m1p.s <- glm(mean ~ dur+res+educ,data=mydata,family=poisson(link=log))
+summary(m1p.s)
+summary(mydata)
+mydata$mean1 <- as.integer(mydata$mean)
+head(mydata)
+?as.integer
+rem(mydata$mean1)
+mydata$mean1 <- ifelse(remainder(mydata$mean1) as.integer(mydata$mean)
+remainder(mydata$mean1)
+15.13%%1
+mydata$mean1 <- ifelse(mydata$mean%%1<0.5, as.integer(mydata$mean),as.integer(mydata$mean)+1)
+head(mydata)
+head(mydata, n=20)
+m1p.s <- glm(mean ~ x1,data=mydata,family=poisson(link=log))#
+summary(m1p.s)#
+m1g.s <- glm(mean ~ x1,data=mydata,family=Gamma(link=log))#
+summary(m1g.s)
+m1p.s <- glm(mean1 ~ x1,data=mydata,family=poisson(link=log))#
+summary(m1p.s)#
+m1g.s <- glm(mean1 ~ x1,data=mydata,family=Gamma(link=log))#
+summary(m1g.s)
+m1g <- glm(mean ~ dur+res+educ,data=mydata,family=Gamma(link=log))
+summary(m1g)
+m1g.s <- glm(mean ~ x1,data=mydata,family=Gamma(link=log))
+summary(m1g.s)
+mydata$mean1000 <- mydata$mean*1000
+mydata$mean1 <- ifelse(mydata$mean1000%%1<0.5, as.integer(mydata$mean1000),as.integer(mydata$mean1000)+1)
+m1p.s <- glm(mean1001 ~ x1,data=mydata,family=poisson(link=log))
+mydata$mean1001 <- ifelse(mydata$mean1000%%1<0.5, as.integer(mydata$mean1000),as.integer(mydata$mean1000)+1)
+head(mydata, n=20)
+mydata$mean10 <- mydata$mean*10
+mydata$mean101 <- ifelse(mydata$mean10%%1<0.5, as.integer(mydata$mean10),as.integer(mydata$mean10)+1)
+head(mydata, n=20)
+m1p.s <- glm(mean101 ~ x1,data=mydata,family=poisson(link=log))
+summary(m1p.s)
+m1g.s <- glm(mean10 ~ x1,data=mydata,family=Gamma(link=log))
+summary(m1g.s)
+m1p.s <- glm(mean101 ~ dur+res+educ,data=mydata,family=poisson(link=log))
+m1g.s <- glm(mean10 ~ dur+res+educ,data=mydata,family=Gamma(link=log))
+summary(m1p.s)
+summary(m1g.s)
+mydata $x1 <- as.factor(1:nrow(mydata))
+logLik(m1p)
+logLik(m1g)
+logLik(m1p)
+logLik(m1g)
+q()
+q()
